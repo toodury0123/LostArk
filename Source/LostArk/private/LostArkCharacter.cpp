@@ -11,6 +11,8 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 
+#include "LostArkPlayerController.h"
+
 ALostArkCharacter::ALostArkCharacter()
 {
 	// Set size for player capsule
@@ -20,6 +22,16 @@ ALostArkCharacter::ALostArkCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+	// Set Character Skeletal Mesh
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> 
+		TempMesh(TEXT("SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
+
+	if (TempMesh.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(TempMesh.Object);
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+	}
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Rotate character to moving direction
