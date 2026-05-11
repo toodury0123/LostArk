@@ -55,6 +55,24 @@ ALostArkCharacter::ALostArkCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	// PlayerController
+	PlayerController = Cast<ALostArkPlayerController>(GetController());
+
+	if (!PlayerController)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("LostArkPlayerController is null"));
+		return;
+	}
+
+	IMC = PlayerController->GetIMC();
+
+	if (!IMC)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IMC_LostArk is null"));
+		return;
+	}
+	
 }
 
 void ALostArkCharacter::Tick(float DeltaSeconds)

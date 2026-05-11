@@ -20,8 +20,8 @@ class LOSTARK_API ALostArkPlayerController : public APlayerController
 public:
 	ALostArkPlayerController();
 
-	void BeginPlay();
-	void SetupInputComponent();
+	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 
 	// Input System
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -33,6 +33,7 @@ public:
 
 	void OnLeftClick(const FInputActionValue& InputValue);
 
+	FORCEINLINE UInputMappingContext* GetIMC() const { return IMC_LostArk; }
 
 	bool IsMonster(AActor* Actor) const;
 	void Move(const struct FInputActionValue& inputValue);
