@@ -5,8 +5,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 
-#include "LostArkCharacter.h"
-
 // Sets default values
 ABaseMonster::ABaseMonster()
 {
@@ -23,37 +21,20 @@ void ABaseMonster::BeginPlay()
 }
 
 // Init
-void ABaseMonster::InitMonster(int HP)
-{
-	maxHP = HP;
-	currentHP = maxHP;
-}
-void ABaseMonster::InitMonster(int HP, float speed)
-{
-	InitMonster(HP);
-	moveSpeed = speed;
-}
-void ABaseMonster::InitMonster(int HP, float speed, float point)
-{
-	InitMonster(HP, speed);
-	attackPoint = point;
-}
 void ABaseMonster::InitMonster(int HP, float speed, float point, float range)
 {
-	InitMonster(HP, speed, point);
+	maxHP = HP;
+	moveSpeed = speed;
+	attackPoint = point;
 	attackRange = range;
 }
 
-void ABaseMonster::Attack(ACharacter* player)
-{
-	ALostArkCharacter* target = Cast<ALostArkCharacter>(player);
-	
-	if (!target)
-	{
-		return;
-	}
 
-	FVector playerLocation = target->GetActorLocation();
+void ABaseMonster::Attack()
+{
+	ALostArkCharacter* player = Cast<ALostArkCharacter>(targetPlayer);
+
+	FVector playerLocation = player->GetActorLocation();
 	FVector monsterLocation = GetActorLocation();
 
 	float distance = FVector::Dist(playerLocation, monsterLocation);
@@ -65,23 +46,25 @@ void ABaseMonster::Attack(ACharacter* player)
 
 	// 미구현 어택모션
 
-	float playerHP = target->GetCurrentHP();
+	float playerHP = player->GetCurrentHP();
 
 	playerHP -= attackPoint;
 
-	target->SetHP(playerHP);
+	player->SetHP(playerHP);
 }
 
-void ABaseMonster::OnDamaged(ACharacter* player)
+void ABaseMonster::Tick(float DeltaTime)
 {
-	ALostArkCharacter* Target = Cast<ALostArkCharacter>(player);
+	Super::Tick(DeltaTime);
+	
 
-	if (!Target)
-	{
-		return;
-	}
+}
 
-	currentHP -= Target->GetAttackPoint();
+void ABaseMonster::OnDamaged()
+{
+	ALostArkCharacter* player = Cast<ALostArkCharacter>(targetPlayer);
+
+	currentHP -= player->GetAttackPoint();
 
 	if (currentHP <= 0.0f)
 	{
@@ -94,14 +77,6 @@ void ABaseMonster::DieProcess()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// 미구현 죽음 모션
-}
-	
-	// Called every frame
-void ABaseMonster::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
-	// 미구현 플레이어 서치 및 돌격
 }
 
 // Called to bind functionality to input

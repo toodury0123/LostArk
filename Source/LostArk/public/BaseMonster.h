@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "LostArkCharacter.h"
+
 #include "BaseMonster.generated.h"
 
 UCLASS(Abstract)
@@ -18,8 +20,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float maxHP = 100.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
-	float currentHP = maxHP;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Monster")
+	float currentHP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float moveSpeed = 300.0f;
@@ -30,6 +32,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float attackPoint = 150.0f;
 
+	UPROPERTY()
+	ALostArkCharacter* targetPlayer ;
+
 public:
 	FORCEINLINE float GetMaxHP() const { return maxHP; }
 	FORCEINLINE float GetCurrentHP() const { return currentHP; }
@@ -39,15 +44,10 @@ public:
 
 protected:
 	// Called when the game starts or when spawned
-	virtual void InitMonster(int HP);
-	virtual void InitMonster(int HP, float speed);
-	virtual void InitMonster(int HP, float speed, float point);
 	virtual void InitMonster(int HP, float speed, float point, float range);
-
-protected:
 	virtual void BeginPlay() override;
-	virtual void Attack(ACharacter* player);
-	virtual void OnDamaged(ACharacter* player);
+	virtual void Attack();
+	virtual void OnDamaged();
 	virtual void DieProcess();
 
 public:

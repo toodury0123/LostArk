@@ -13,10 +13,6 @@ UCLASS()
 class LOSTARK_API ANormalMonster : public ABaseMonster
 {
 	GENERATED_BODY()
-	
-
-public:
-	//virtual void OnDamaged(ACharacter* Player) override;
 
 public:
 	// Called every frame

@@ -61,7 +61,6 @@ void ALostArkPlayerController::SetupInputComponent()
 		EnhancedInput->BindAction(ia_MouseWheel, ETriggerEvent::Triggered, this, &ALostArkPlayerController::Zoom);
 		// ¹Ì±¸Çö
 		// EnhancedInput->BindAction(ia_LeftClick, ETriggerEvent::Started, this, &ALostArkPlayerController::OnLeftClick);
-		// EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Started, this, &ALostArkPlayerController::Move);
 		// EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Completed, this, &ALostArkPlayerController::Move);
 	}
 }
