@@ -24,7 +24,7 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-
+	void SetCameraArmLength(float length);
 
 // Left Click
 public:
@@ -51,6 +51,7 @@ public:
 
 	FORCEINLINE float GetAttackPoint() const { return attackPoint; }
 	FORCEINLINE float GetCurrentHP() const { return currentHP; }
+	FORCEINLINE FVector GetCharacterLocation() const { return GetActorLocation(); }
 
 	void SetHP(float HP);
 

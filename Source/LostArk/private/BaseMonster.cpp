@@ -3,6 +3,7 @@
 
 #include "BaseMonster.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 #include "LostArkCharacter.h"
 
@@ -45,18 +46,30 @@ void ABaseMonster::InitMonster(int HP, float speed, float point, float range)
 
 void ABaseMonster::Attack(ACharacter* player)
 {
-	ALostArkCharacter* Target = Cast<ALostArkCharacter>(player);
-
-	if (!Target)
+	ALostArkCharacter* target = Cast<ALostArkCharacter>(player);
+	
+	if (!target)
 	{
 		return;
 	}
 
-	float playerHP = Target->GetCurrentHP();
+	FVector playerLocation = target->GetActorLocation();
+	FVector monsterLocation = GetActorLocation();
+
+	float distance = FVector::Dist(playerLocation, monsterLocation);
+
+	if (distance > attackRange)
+	{
+		return;
+	}
+
+	// 미구현 어택모션
+
+	float playerHP = target->GetCurrentHP();
 
 	playerHP -= attackPoint;
 
-	Target->SetHP(playerHP);
+	target->SetHP(playerHP);
 }
 
 void ABaseMonster::OnDamaged(ACharacter* player)
@@ -78,14 +91,17 @@ void ABaseMonster::OnDamaged(ACharacter* player)
 
 void ABaseMonster::DieProcess()
 {
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	// 미구현 죽음 모션
 }
 	
 	// Called every frame
 void ABaseMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
+	// 미구현 플레이어 서치 및 돌격
 }
 
 // Called to bind functionality to input

@@ -9,6 +9,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+
+#include "GameFramework/SpringArmComponent.h"
+
 #include "LostArkCharacter.h"
 
 ALostArkPlayerController::ALostArkPlayerController()
@@ -55,7 +58,7 @@ void ALostArkPlayerController::SetupInputComponent()
 		Cast<UEnhancedInputComponent>(InputComponent))
 	{
 		EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Triggered, this, &ALostArkPlayerController::Move);
-
+		EnhancedInput->BindAction(ia_MouseWheel, ETriggerEvent::Triggered, this, &ALostArkPlayerController::Zoom);
 		// ¹Ì±¸Çö
 		// EnhancedInput->BindAction(ia_LeftClick, ETriggerEvent::Started, this, &ALostArkPlayerController::OnLeftClick);
 		// EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Started, this, &ALostArkPlayerController::Move);
@@ -87,6 +90,17 @@ void ALostArkPlayerController::OnLeftClick(const FInputActionValue& InputValue)
 	}
 }
 
+void ALostArkCharacter::SetCameraArmLength(float length)
+{
+	if (!CameraBoom)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CAMERABOOM IS NOT EXIST"));
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("ZOOM IS CLAMPING AGAIN"));
+	CameraBoom->TargetArmLength = FMath::Clamp(length, 300.f, 1200.f);
+}
+
 void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 {
 	FHitResult Hit;
@@ -109,10 +123,6 @@ void ALostArkCharacter::SetHP(float HP)
 	}
 }
 
-void ALostArkCharacter::DieProccess()
-{
-}
-
 void ALostArkPlayerController::Attack(const FInputActionValue& InputValue)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Attack"));
@@ -126,4 +136,28 @@ bool ALostArkPlayerController::IsMonster(AActor* Actor) const
 	}
 
 	return Actor->ActorHasTag(TEXT("Monster"));
+}
+
+void ALostArkPlayerController::Zoom(const FInputActionValue& Value)
+{
+	float AxisValue = Value.Get<float>();
+
+	ALostArkCharacter* PlayerCharacter = Cast<ALostArkCharacter>(GetCharacter());
+	
+	if (!PlayerCharacter)
+	{
+		return;
+	}
+
+	if (!PlayerCharacter->GetCameraBoom())
+	{
+		return;
+	}
+
+	float newLength =
+		PlayerCharacter->GetCameraBoom()->TargetArmLength
+		+ (-AxisValue * 100.f);
+
+	newLength = FMath::Clamp(newLength, 500.f, 1200.f);
+	PlayerCharacter->SetCameraArmLength(newLength);
 }

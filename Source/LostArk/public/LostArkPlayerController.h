@@ -30,8 +30,12 @@ public:
 	class UInputAction* ia_LeftClick;
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_RightClick;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_MouseWheel;
 
 	void OnLeftClick(const FInputActionValue& InputValue);
+	void Zoom(const FInputActionValue& Value);
+
 
 	FORCEINLINE UInputMappingContext* GetIMC() const { return IMC_LostArk; }
 
