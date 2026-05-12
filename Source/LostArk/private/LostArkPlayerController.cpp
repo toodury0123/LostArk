@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "LostArkCharacter.h"
 
 ALostArkPlayerController::ALostArkPlayerController()
 {
@@ -96,6 +97,20 @@ void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 		UE_LOG(LogTemp, Warning, TEXT("CLICK"));
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Hit.ImpactPoint);
 	}
+}
+
+void ALostArkCharacter::SetHP(float HP)
+{
+	currentHP = HP;
+
+	if (currentHP <= 0.0f)
+	{
+		DieProccess();
+	}
+}
+
+void ALostArkCharacter::DieProccess()
+{
 }
 
 void ALostArkPlayerController::Attack(const FInputActionValue& InputValue)

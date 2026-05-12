@@ -4,6 +4,8 @@
 #include "BaseMonster.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "LostArkCharacter.h"
+
 // Sets default values
 ABaseMonster::ABaseMonster()
 {
@@ -19,12 +21,67 @@ void ABaseMonster::BeginPlay()
 	
 }
 
-void ABaseMonster::InitMonster()
+// Init
+void ABaseMonster::InitMonster(int HP)
 {
-	maxHP = 300.0f;
+	maxHP = HP;
+	currentHP = maxHP;
+}
+void ABaseMonster::InitMonster(int HP, float speed)
+{
+	InitMonster(HP);
+	moveSpeed = speed;
+}
+void ABaseMonster::InitMonster(int HP, float speed, float point)
+{
+	InitMonster(HP, speed);
+	attackPoint = point;
+}
+void ABaseMonster::InitMonster(int HP, float speed, float point, float range)
+{
+	InitMonster(HP, speed, point);
+	attackRange = range;
 }
 
-// Called every frame
+void ABaseMonster::Attack(ACharacter* player)
+{
+	ALostArkCharacter* Target = Cast<ALostArkCharacter>(player);
+
+	if (!Target)
+	{
+		return;
+	}
+
+	float playerHP = Target->GetCurrentHP();
+
+	playerHP -= attackPoint;
+
+	Target->SetHP(playerHP);
+}
+
+void ABaseMonster::OnDamaged(ACharacter* player)
+{
+	ALostArkCharacter* Target = Cast<ALostArkCharacter>(player);
+
+	if (!Target)
+	{
+		return;
+	}
+
+	currentHP -= Target->GetAttackPoint();
+
+	if (currentHP <= 0.0f)
+	{
+		DieProcess();
+	}
+}
+
+void ABaseMonster::DieProcess()
+{
+
+}
+	
+	// Called every frame
 void ABaseMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -32,9 +89,8 @@ void ABaseMonster::Tick(float DeltaTime)
 }
 
 // Called to bind functionality to input
-void ABaseMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
+//void ABaseMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+//{
+//	Super::SetupPlayerInputComponent(PlayerInputComponent);
+//
+//}

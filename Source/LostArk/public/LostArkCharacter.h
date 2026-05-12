@@ -4,15 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "InputActionValue.h"
 #include "LostArkCharacter.generated.h"
 
 UCLASS(Blueprintable)
-class ALostArkCharacter : public ACharacter
+class LOSTARK_API ALostArkCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	ALostArkCharacter();
+
+	virtual void BeginPlay() override;
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
@@ -40,6 +43,18 @@ private:
 	// PlayerInput
 	class ALostArkPlayerController* PlayerController;
 	class UInputMappingContext* IMC;
-	
+
+public:
+	float maxHP;
+	float currentHP;
+	float attackPoint;
+
+	FORCEINLINE float GetAttackPoint() const { return attackPoint; }
+	FORCEINLINE float GetCurrentHP() const { return currentHP; }
+
+	void SetHP(float HP);
+
+private:
+	void DieProccess();
 };
 
