@@ -24,17 +24,24 @@ void ABaseMonster::BeginPlay()
 void ABaseMonster::InitMonster(int HP, float speed, float point, float range)
 {
 	maxHP = HP;
+	currentHP = maxHP;
+
 	moveSpeed = speed;
 	attackPoint = point;
 	attackRange = range;
+
+	GetCharacterMovement()->MaxWalkSpeed = moveSpeed;
 }
 
 
 void ABaseMonster::Attack()
 {
-	ALostArkCharacter* player = Cast<ALostArkCharacter>(targetPlayer);
+	if (!targetPlayer)
+	{
+		return;
+	}
 
-	FVector playerLocation = player->GetActorLocation();
+	FVector playerLocation = targetPlayer->GetActorLocation();
 	FVector monsterLocation = GetActorLocation();
 
 	float distance = FVector::Dist(playerLocation, monsterLocation);
@@ -46,11 +53,11 @@ void ABaseMonster::Attack()
 
 	// 미구현 어택모션
 
-	float playerHP = player->GetCurrentHP();
+	float playerHP = targetPlayer->GetCurrentHP();
 
 	playerHP -= attackPoint;
 
-	player->SetHP(playerHP);
+	targetPlayer->SetHP(playerHP);
 }
 
 void ABaseMonster::Tick(float DeltaTime)
@@ -60,14 +67,13 @@ void ABaseMonster::Tick(float DeltaTime)
 
 }
 
-void ABaseMonster::OnDamaged()
+void ABaseMonster::OnDamaged(float Damage)
 {
-	ALostArkCharacter* player = Cast<ALostArkCharacter>(targetPlayer);
-
-	currentHP -= player->GetAttackPoint();
+	currentHP -= Damage;
 
 	if (currentHP <= 0.0f)
 	{
+		currentHP = 0.0f;
 		DieProcess();
 	}
 }
@@ -75,7 +81,7 @@ void ABaseMonster::OnDamaged()
 void ABaseMonster::DieProcess()
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	Destroy();
 	// 미구현 죽음 모션
 }
 

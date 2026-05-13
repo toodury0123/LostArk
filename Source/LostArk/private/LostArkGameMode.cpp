@@ -4,6 +4,8 @@
 #include "LostArkCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
+#include "Crystal.h"
+
 ALostArkGameMode::ALostArkGameMode()
 {
 	// set default pawn class to our Blueprinted character

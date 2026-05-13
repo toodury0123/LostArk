@@ -20,8 +20,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float maxHP = 100.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Monster")
-	float currentHP;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
+	float currentHP = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float moveSpeed = 300.0f;
@@ -47,7 +47,7 @@ protected:
 	virtual void InitMonster(int HP, float speed, float point, float range);
 	virtual void BeginPlay() override;
 	virtual void Attack();
-	virtual void OnDamaged();
+	virtual void OnDamaged(float Damage);
 	virtual void DieProcess();
 
 public:

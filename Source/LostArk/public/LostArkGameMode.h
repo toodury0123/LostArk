@@ -13,6 +13,17 @@ class ALostArkGameMode : public AGameModeBase
 
 public:
 	ALostArkGameMode();
+
+	UPROPERTY(EditAnywhere, Category = "Chaos")
+	TSubclassOf<class ACrystal> CrystalFactory;
+
+	UPROPERTY(EditAnywhere, Category = "Chaos")
+	TArray<AActor*> CrystalSpawnPoints;
+
+	int32 CurrentKillCount = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Chaos")
+	int32 TargetKillCount = 50;
 };
 
 

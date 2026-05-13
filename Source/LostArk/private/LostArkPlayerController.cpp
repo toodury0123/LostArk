@@ -65,49 +65,67 @@ void ALostArkPlayerController::SetupInputComponent()
 	}
 }
 
+bool ALostArkPlayerController::GetMouseWorldLocation(FVector& OutLocation)
+{
+	FHitResult Hit;
+	bool bHit = GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+
+	if (!bHit)
+	{
+		return false;
+	}
+
+	OutLocation = Hit.ImpactPoint;
+	return true;
+}
+
 void ALostArkPlayerController::OnLeftClick(const FInputActionValue& InputValue)
 {
 	// TEST
-	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	FVector MouseLocation;
 
-	if (!Hit.bBlockingHit)
+	if (!GetMouseWorldLocation(MouseLocation))
 	{
 		return;
 	}
 
-	AActor* HitActor = Hit.GetActor();
+	ALostArkCharacter* PlayerCharacter =
+		Cast<ALostArkCharacter>(GetCharacter());
 
-	if (IsMonster(HitActor))
+	if (!PlayerCharacter)
 	{
-		Attack(InputValue);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Clicked Actor : %s"),
-			HitActor ? *HitActor->GetName() : TEXT("None"));
-	}
-}
-
-void ALostArkCharacter::SetCameraArmLength(float length)
-{
-	if (!CameraBoom)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("CAMERABOOM IS NOT EXIST"));
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("ZOOM IS CLAMPING AGAIN"));
-	CameraBoom->TargetArmLength = FMath::Clamp(length, 300.f, 1200.f);
+
+	FVector Direction =
+		MouseLocation - PlayerCharacter->GetActorLocation();
+
+	Direction.Z = 0.f;
+
+	if (Direction.IsNearlyZero())
+	{
+		return;
+	}
+
+	PlayerCharacter->SetActorRotation(Direction.Rotation());
+	//PlayerCharacter->Attack();
 }
 
 void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 {
+	float AxisValue = InputValue.Get<float>();
+
+	if (AxisValue <= 0.f)
+	{
+		return;
+	}
+
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
 	if (Hit.bBlockingHit)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CLICK"));
+		UE_LOG(LogTemp, Warning, TEXT("MOVE HOLD"));
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Hit.ImpactPoint);
 	}
 }

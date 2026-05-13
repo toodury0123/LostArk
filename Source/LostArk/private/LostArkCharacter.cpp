@@ -79,6 +79,17 @@ void ALostArkCharacter::BeginPlay()
 	}
 }
 
+void ALostArkCharacter::SetCameraArmLength(float length)
+{
+	if (!CameraBoom)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CAMERABOOM IS NOT EXIST"));
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("ZOOM IS CLAMPING AGAIN"));
+	CameraBoom->TargetArmLength = FMath::Clamp(length, 300.f, 1200.f);
+}
+
 void ALostArkCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);

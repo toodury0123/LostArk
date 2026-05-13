@@ -33,6 +33,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_MouseWheel;
 
+	bool GetMouseWorldLocation(FVector& OutLocation);
 	void OnLeftClick(const FInputActionValue& InputValue);
 	void Zoom(const FInputActionValue& Value);
 
