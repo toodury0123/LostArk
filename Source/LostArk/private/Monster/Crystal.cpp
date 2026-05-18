@@ -30,11 +30,6 @@ void ACrystal::Tick(float DeltaTime)
 	// Check Damage
 }
 
-void ACrystal::SpawnMonster()
-{
-
-}
-
 void ACrystal::Damgaed()
 {
 	// Shake Motion

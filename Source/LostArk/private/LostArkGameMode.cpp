@@ -14,4 +14,6 @@ ALostArkGameMode::ALostArkGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+	
+	
 }

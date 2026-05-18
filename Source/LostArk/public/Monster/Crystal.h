@@ -29,17 +29,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* CrystalMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TSubclassOf<ABaseMonster> NormalMonsterClass;
-
-	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TSubclassOf<ABaseMonster> NamedMonsterClass;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	void SpawnMonster();
 
 	void Damgaed();
 
