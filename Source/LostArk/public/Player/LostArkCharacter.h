@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Player/LostArkPlayerController.h"
 #include "InputActionValue.h"
+
 #include "LostArkCharacter.generated.h"
+
 
 UCLASS(Blueprintable)
 class LOSTARK_API ALostArkCharacter : public ACharacter
@@ -26,9 +29,11 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	void SetCameraArmLength(float length);
 
-// Left Click
 public:
-	void Move(const struct FInputActionValue& inputValue);
+// Left Click
+	void Attack(FHitResult point);
+// Right Click
+	//void Move(const struct FInputActionValue& inputValue);
 
 private:
 	/** Top down camera */
@@ -45,10 +50,6 @@ private:
 	class UInputMappingContext* IMC;
 
 public:
-	float maxHP;
-	float currentHP;
-	float attackPoint;
-
 	FORCEINLINE float GetAttackPoint() const { return attackPoint; }
 	FORCEINLINE float GetCurrentHP() const { return currentHP; }
 	FORCEINLINE FVector GetCharacterLocation() const { return GetActorLocation(); }
@@ -56,6 +57,10 @@ public:
 	void SetHP(float HP);
 
 private:
+	float maxHP;
+	float currentHP;
+	float attackPoint;
+
 	void DieProccess();
 };
 

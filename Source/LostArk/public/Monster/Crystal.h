@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 
 //#include "BaseMonster.h"
-#include "NormalMonster.h"
+#include "Monster/NormalMonster.h"
 
 #include "Crystal.generated.h"
 

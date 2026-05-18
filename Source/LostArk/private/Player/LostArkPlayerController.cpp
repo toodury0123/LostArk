@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LostArkPlayerController.h"
+#include "Player/LostArkPlayerController.h"
 
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
@@ -12,7 +12,7 @@
 
 #include "GameFramework/SpringArmComponent.h"
 
-#include "LostArkCharacter.h"
+#include "Player/LostArkCharacter.h"
 
 ALostArkPlayerController::ALostArkPlayerController()
 {
@@ -60,8 +60,8 @@ void ALostArkPlayerController::SetupInputComponent()
 		EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Triggered, this, &ALostArkPlayerController::Move);
 		EnhancedInput->BindAction(ia_MouseWheel, ETriggerEvent::Triggered, this, &ALostArkPlayerController::Zoom);
 		// ¹Ì±¸Çö
-		// EnhancedInput->BindAction(ia_LeftClick, ETriggerEvent::Started, this, &ALostArkPlayerController::OnLeftClick);
-		// EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Completed, this, &ALostArkPlayerController::Move);
+		EnhancedInput->BindAction(ia_LeftClick, ETriggerEvent::Started, this, &ALostArkPlayerController::OnLeftClick);
+		EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Completed, this, &ALostArkPlayerController::Move);
 	}
 }
 
@@ -108,7 +108,7 @@ void ALostArkPlayerController::OnLeftClick(const FInputActionValue& InputValue)
 	}
 
 	PlayerCharacter->SetActorRotation(Direction.Rotation());
-	//PlayerCharacter->Attack();
+	Attack(InputValue);
 }
 
 void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
@@ -125,7 +125,7 @@ void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 
 	if (Hit.bBlockingHit)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MOVE HOLD"));
+		//UE_LOG(LogTemp, Warning, TEXT("MOVE HOLD"));
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Hit.ImpactPoint);
 	}
 }
@@ -140,11 +140,6 @@ void ALostArkCharacter::SetHP(float HP)
 	}
 }
 
-void ALostArkPlayerController::Attack(const FInputActionValue& InputValue)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Attack"));
-}
-
 bool ALostArkPlayerController::IsMonster(AActor* Actor) const
 {
 	if (!Actor)
@@ -155,9 +150,26 @@ bool ALostArkPlayerController::IsMonster(AActor* Actor) const
 	return Actor->ActorHasTag(TEXT("Monster"));
 }
 
-void ALostArkPlayerController::Zoom(const FInputActionValue& Value)
+void ALostArkPlayerController::Attack(const FInputActionValue& inputValue)
 {
-	float AxisValue = Value.Get<float>();
+	float AxisValue = inputValue.Get<float>();
+
+	ALostArkCharacter* PlayerCharacter = Cast<ALostArkCharacter>(GetCharacter());
+
+	if (!PlayerCharacter)
+	{
+		return;
+	}
+
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+
+	PlayerCharacter->Attack(Hit);
+}
+
+void ALostArkPlayerController::Zoom(const FInputActionValue& inputValue)
+{
+	float AxisValue = inputValue.Get<float>();
 
 	ALostArkCharacter* PlayerCharacter = Cast<ALostArkCharacter>(GetCharacter());
 	

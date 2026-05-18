@@ -1,9 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BaseMonster.h"
+#include "Monster/BaseMonster.h"
 #include "GameFramework/CharacterMovementComponent.h"
+
+#include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+
 
 // Sets default values
 ABaseMonster::ABaseMonster()
@@ -17,7 +20,8 @@ ABaseMonster::ABaseMonster()
 void ABaseMonster::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	FindTarget();
 }
 
 // Init
@@ -36,21 +40,6 @@ void ABaseMonster::InitMonster(int HP, float speed, float point, float range)
 
 void ABaseMonster::Attack()
 {
-	if (!targetPlayer)
-	{
-		return;
-	}
-
-	FVector playerLocation = targetPlayer->GetActorLocation();
-	FVector monsterLocation = GetActorLocation();
-
-	float distance = FVector::Dist(playerLocation, monsterLocation);
-
-	if (distance > attackRange)
-	{
-		return;
-	}
-
 	// 미구현 어택모션
 
 	float playerHP = targetPlayer->GetCurrentHP();
@@ -64,6 +53,7 @@ void ABaseMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+	MoveToTarget(DeltaTime);
 
 }
 
@@ -83,6 +73,50 @@ void ABaseMonster::DieProcess()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Destroy();
 	// 미구현 죽음 모션
+}
+
+ALostArkCharacter* ABaseMonster::FindTarget()
+{
+	targetPlayer =
+		Cast<ALostArkCharacter>(
+			UGameplayStatics::GetPlayerCharacter(this, 0)
+		);
+
+	if (targetPlayer == nullptr)
+		return nullptr;
+
+	return targetPlayer;
+}
+
+void ABaseMonster::MoveToTarget(float DeltaTime)
+{
+	if (!targetPlayer)
+	{
+		return;
+	}
+
+	if (IsTargetInAttackRange())
+	{
+		Attack();
+		return;
+	}
+
+	FVector direction =
+		targetPlayer->GetActorLocation() - GetActorLocation();
+
+	direction.Z = 0.0f;
+	direction.Normalize();
+
+	AddMovementInput(direction, 1.0f);
+}
+
+bool ABaseMonster::IsTargetInAttackRange() const
+{
+	return false;
+}
+
+void ABaseMonster::ResetAttack()
+{
 }
 
 // Called to bind functionality to input

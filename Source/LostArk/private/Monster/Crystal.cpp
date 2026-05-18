@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Crystal.h"
+#include "Monster/Crystal.h"
 
 // Sets default values
 ACrystal::ACrystal()
@@ -28,6 +28,11 @@ void ACrystal::Tick(float DeltaTime)
 
 	// If Is Attacked
 	// Check Damage
+}
+
+void ACrystal::SpawnMonster()
+{
+
 }
 
 void ACrystal::Damgaed()

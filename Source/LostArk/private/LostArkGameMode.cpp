@@ -1,10 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "LostArkGameMode.h"
-#include "LostArkCharacter.h"
+#include "Player/LostArkCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
-#include "Crystal.h"
+#include "Monster/Crystal.h"
 
 ALostArkGameMode::ALostArkGameMode()
 {

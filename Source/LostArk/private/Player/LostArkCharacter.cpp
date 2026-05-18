@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "LostArkCharacter.h"
+#include "Player/LostArkCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
@@ -11,7 +11,6 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 
-#include "LostArkPlayerController.h"
 
 ALostArkCharacter::ALostArkCharacter()
 {
@@ -88,6 +87,10 @@ void ALostArkCharacter::SetCameraArmLength(float length)
 	}
 	UE_LOG(LogTemp, Warning, TEXT("ZOOM IS CLAMPING AGAIN"));
 	CameraBoom->TargetArmLength = FMath::Clamp(length, 300.f, 1200.f);
+}
+
+void ALostArkCharacter::Attack(FHitResult point)
+{
 }
 
 void ALostArkCharacter::Tick(float DeltaSeconds)
