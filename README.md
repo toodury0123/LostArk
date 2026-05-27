@@ -39,4 +39,4 @@ Source/
 ## 추가 콘텐츠 팩
 - ROG Creatures: Stickman
 - Qudraped Fantasy Creatures / Centaur
-- Realistic Starter VFX Pack Vol
+- Realistic Starter VFX Pack Vol 2
