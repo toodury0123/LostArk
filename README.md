@@ -26,6 +26,9 @@
 1. `LostArk.uproject` 실행
 2. 필요 시 Visual Studio에서 `Development Editor` 빌드
 
+## 임시
+- Attack 은 모션 없이 전부 왼쪽 클릭 한번으로 처리
+
 ## 폴더 구조
 Source/
 ├── Player/
