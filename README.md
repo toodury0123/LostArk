@@ -30,11 +30,31 @@
 - Attack 은 모션 없이 전부 왼쪽 클릭 한번으로 처리
 
 ## 폴더 구조
-Source/
-├── Player/
-├── Monster/
-├── Dungeon/
-└── UI/
+## Project Structure
+
+LostArk/
+├── Source/
+│   └── LostArk/
+│       ├── Player/               # Player Character / Controller
+│       ├── Monster/              # Monster AI / Crystal / Spawn Logic
+│       └── Public / Private      # Unreal C++ Structure
+│
+├── Content/
+│   ├── Blueprints/
+│   │   ├── Player/
+│   │   └── Monster/
+│   │
+│   ├── TopDown/
+│   │   ├── Maps/
+│   │   └── Input/
+│   │
+│   ├── ROG_Creatures/        # Monster Assets
+│   ├── QuadrapedCreatures/   # Creature Assets
+│   └── Realistic_Starter_VFX_Pack_Vol2/
+│
+├── Config/
+├── Plugins/
+└── LostArk.uproject
 
 ## 추가 콘텐츠 팩
 - ROG Creatures: Stickman
