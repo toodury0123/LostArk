@@ -45,6 +45,7 @@ LostArk/
 │   └── LostArk/
 │       ├── Player/           # Player Character / Controller
 │       ├── Monster/          # Monster AI / Crystal / Spawn Logic
+│       ├── UI/               # Main UI / MiniMap / End
 │       └── Public / Private  # Unreal C++ Structure
 │
 ├── Content/
@@ -56,7 +57,7 @@ LostArk/
 │   ├── TopDown/
 │   │   ├── Maps/
 │   │   ├── Input/
-│   │   └── Input/
+│   │   └── UI/
 │   │
 │   ├── ROG_Creatures/        # Monster Assets
 │   ├── QuadrapedCreatures/   # Creature Assets
