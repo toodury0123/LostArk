@@ -30,9 +30,9 @@
 
 ## 임시
 - Attack 은 모션 없이 전부 왼쪽 클릭 한번으로 처리
+- 이로 인해, Attack 쿨타임이 없어 클릭 여러번 처리 시, 지저분하게 보임
 
 ## 폴더 구조
-## Project Structure
 
 ## Project Structure
 
