@@ -51,9 +51,11 @@ LostArk/
 │   ├── Blueprints/
 │   │   ├── Player/
 │   │   └── Monster/
+│   │   └── UI/
 │   │
 │   ├── TopDown/
 │   │   ├── Maps/
+│   │   ├── Input/
 │   │   └── Input/
 │   │
 │   ├── ROG_Creatures/        # Monster Assets
