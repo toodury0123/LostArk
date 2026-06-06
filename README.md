@@ -60,7 +60,7 @@ LostArk/
 │   │   └── UI/
 │   │
 │   ├── ROG_Creatures/        # Monster Assets
-│   └──QuadrapedCreatures/   # Creature Assets
+│   └── QuadrapedCreatures/   # Creature Assets
 │
 ├── Config/
 ├── Plugins/
