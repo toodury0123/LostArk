@@ -8,8 +8,8 @@ public class LostArkEditorTarget : TargetRules
 	public LostArkEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-		DefaultBuildSettings = BuildSettingsVersion.V5;
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
+		DefaultBuildSettings = BuildSettingsVersion.V7;
+
 		ExtraModuleNames.Add("LostArk");
 	}
 }
