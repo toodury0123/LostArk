@@ -4,8 +4,8 @@
 로스트아크의 카오스 던전 모작 프로젝트입니다
 
 ## 개발 환경
-- Unreal Engine 5.4
-- Visual Studio 2022
+- Unreal Engine 5.6
+- Visual Studio 2026
 - C++
 
 ## 주요 시스템
