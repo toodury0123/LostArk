@@ -8,6 +8,8 @@
 - Visual Studio 2026
 - C++
 
+## 5.8 이식으로 인하여 아래 시스템은 전부 수정 중입니다
+
 ## 주요 시스템
 - 우클릭 이동
 - 좌클릭 시, 이펙트 생성. 크리스탈 파괴 및 몬스터 공격
@@ -15,7 +17,7 @@
 - 크리스탈에 의한 몬스터 소환 시스템
 - 노말 몬스터와 레어 몬스터의 구분
 - 레어 몬스터 사망 시, 클리어 시스템
-- 미니맵
+- 미니맵 
 - 재시작 시스템
 
 ## 구현 예정 시스템
@@ -54,10 +56,7 @@ LostArk/
 │   │   ├── Player/
 │   │   └── Monster/
 │   │   └── UI/
-│   ├── Input/
-│   │
-│   ├── ROG_Creatures/        # Monster Assets
-│   └── QuadrapedCreatures/   # Creature Assets
+│   └── Input/
 │
 ├── Config/
 ├── Plugins/
@@ -65,5 +64,4 @@ LostArk/
 ```
 ```
 ## 추가 콘텐츠 팩
-- ROG Creatures: Stickman
-- Qudraped Fantasy Creatures / Centaur
+- Paragon : Rampage
