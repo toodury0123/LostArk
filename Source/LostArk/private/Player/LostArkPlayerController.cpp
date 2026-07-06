@@ -89,16 +89,14 @@ void ALostArkPlayerController::OnLeftClick(const FInputActionValue& InputValue)
 		return;
 	}
 
-	ALostArkCharacter* PlayerCharacter =
-		Cast<ALostArkCharacter>(GetCharacter());
+	ALostArkCharacter* PlayerCharacter = Cast<ALostArkCharacter>(GetCharacter());
 
 	if (!PlayerCharacter)
 	{
 		return;
 	}
 
-	FVector Direction =
-		MouseLocation - PlayerCharacter->GetActorLocation();
+	FVector Direction =	MouseLocation - PlayerCharacter->GetActorLocation();
 
 	Direction.Z = 0.f;
 

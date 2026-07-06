@@ -13,8 +13,5 @@ UCLASS()
 class LOSTARK_API ANormalMonster : public ABaseMonster
 {
 	GENERATED_BODY()
-
-public:
-	// Called every frame
-	//virtual void Tick(float DeltaTime) override;
+	
 };

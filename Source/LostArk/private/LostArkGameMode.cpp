@@ -8,12 +8,19 @@
 
 ALostArkGameMode::ALostArkGameMode()
 {
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/BP_TopDownCharacter"));
-	if (PlayerPawnBPClass.Class != nullptr)
-	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
-	
-	
+    UE_LOG(LogTemp, Warning, TEXT("LostArkGameMode 1"));
+
+    static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(
+        TEXT("/Game/TopDown/Blueprints/BP_TopDownCharacter")
+    );
+
+    UE_LOG(LogTemp, Warning, TEXT("LostArkGameMode 2"));
+
+    if (PlayerPawnBPClass.Succeeded())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("LostArkGameMode 3"));
+        DefaultPawnClass = PlayerPawnBPClass.Class;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("LostArkGameMode 4"));
 }
