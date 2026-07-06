@@ -6,6 +6,6 @@
 
 AProjectGameModeBase::AProjectGameModeBase()
 {
-	//PRINT_CALLINFO();
+	PRINT_CALLINFO();
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *CALLINFO);
 }

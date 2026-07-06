@@ -64,3 +64,4 @@ private:
 	void DieProccess();
 };
 
+	

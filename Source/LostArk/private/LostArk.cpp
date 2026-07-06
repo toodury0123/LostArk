@@ -3,7 +3,6 @@
 #include "LostArk.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, LostArk, "LostArk" );
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, LostArk, "LostArk");
 
 DEFINE_LOG_CATEGORY(LogLostArk)
- 

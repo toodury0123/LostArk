@@ -1,33 +1,21 @@
-# Visual Studio
 .vs/
-
-# Unreal
 Binaries/
 Build/
 DerivedDataCache/
 Intermediate/
 Saved/
 
-# Rider
-.idea/
+*.sln
+*.slnx
 
-# VSCode
-.vscode/
-
-# Visual Studio files
 *.VC.db
 *.VC.opendb
-*.opensdf
-*.sdf
 *.suo
 *.user
 *.userprefs
 
-# Solution launch files
-*.slnx
+.vscode/
+.idea/
 
-# Crash logs
-*.dmp
-
-# Logs
-*.log
+Thumbs.db
+.DS_Store

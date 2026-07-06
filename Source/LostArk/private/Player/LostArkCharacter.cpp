@@ -91,6 +91,7 @@ void ALostArkCharacter::SetCameraArmLength(float length)
 
 void ALostArkCharacter::Attack(FHitResult point)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Input Attack"));
 }
 
 void ALostArkCharacter::Tick(float DeltaSeconds)

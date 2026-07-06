@@ -5,13 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 
-#include "Monster/BaseMonster.h"
-#include "Monster/Crystal.h"
-
 #include "LostArkGameMode.generated.h"
 
+class ACrystal;
+class ABaseMonster;
 
-UCLASS(minimalapi)
+UCLASS()
 class ALostArkGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
