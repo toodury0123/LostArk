@@ -37,25 +37,66 @@ void ABaseMonster::InitMonster(int HP, float speed, float point, float range)
 	GetCharacterMovement()->MaxWalkSpeed = moveSpeed;
 }
 
-
-void ABaseMonster::Attack()
-{
-	// 미구현 어택모션
-
-	float playerHP = targetPlayer->GetCurrentHP();
-
-	playerHP -= attackPoint;
-
-	targetPlayer->SetHP(playerHP);
-}
-
 void ABaseMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	MoveToTarget(DeltaTime);
 
+	if (!targetPlayer)
+	{
+		FindTarget();
+		return;
+	}
+
+	if (bIsAttacking)
+		return;
+
+	if (!IsTargetInAttackRange())
+	{
+		MoveToTarget(DeltaTime);
+	}
+	else
+	{
+		Attack();
+	}
 }
+
+// ====================== Attack Proccess ==================== //
+
+void ABaseMonster::Attack()
+{
+	if (!AttackMontage)
+		return;
+
+	if (bIsAttacking)
+		return;
+
+	bIsAttacking = true;
+
+	GetCharacterMovement()->StopMovementImmediately();
+
+	PlayAnimMontage(AttackMontage);
+}
+
+void ABaseMonster::AttackHit()
+{
+	if (!targetPlayer)
+		return;
+
+	if (!IsTargetInAttackRange())
+		return;
+
+	float playerHP = targetPlayer->GetCurrentHP();
+	playerHP -= attackPoint;
+	targetPlayer->SetHP(playerHP);
+}
+
+void ABaseMonster::ResetAttack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ResetAttack Called"));
+	bIsAttacking = false;
+}
+
+// ==================== Dying  Proccess ==================== //
 
 void ABaseMonster::OnDamaged(float Damage)
 {
@@ -75,6 +116,8 @@ void ABaseMonster::DieProcess()
 	// 미구현 죽음 모션
 }
 
+// ================= Move Proccess ========================= // 
+
 ALostArkCharacter* ABaseMonster::FindTarget()
 {
 	targetPlayer =
@@ -90,33 +133,34 @@ ALostArkCharacter* ABaseMonster::FindTarget()
 
 void ABaseMonster::MoveToTarget(float DeltaTime)
 {
-	if (!targetPlayer)
-	{
-		return;
-	}
-
-	if (IsTargetInAttackRange())
-	{
-		Attack();
-		return;
-	}
-
-	FVector direction =
-		targetPlayer->GetActorLocation() - GetActorLocation();
+	FVector direction =	targetPlayer->GetActorLocation() - GetActorLocation();
 
 	direction.Z = 0.0f;
-	direction.Normalize();
 
-	AddMovementInput(direction, 1.0f);
+	if (!direction.IsNearlyZero())
+	{
+		direction.Normalize();
+
+		AddMovementInput(direction, 1.0f);
+
+		FRotator targetRotation = direction.Rotation();
+		targetRotation.Yaw += 180.f;
+
+		SetActorRotation(targetRotation);
+	}
 }
 
 bool ABaseMonster::IsTargetInAttackRange() const
 {
-	return false;
-}
+	if (!targetPlayer)
+		return false;
 
-void ABaseMonster::ResetAttack()
-{
+	float Distance = FVector::Dist(
+		GetActorLocation(),
+		targetPlayer->GetActorLocation()
+	);
+
+	return Distance <= attackRange;
 }
 
 // Called to bind functionality to input
