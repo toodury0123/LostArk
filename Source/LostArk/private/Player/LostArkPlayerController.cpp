@@ -124,6 +124,8 @@ void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 	if (Hit.bBlockingHit)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("MOVE HOLD"));
+		UE_LOG(LogTemp, Warning, TEXT("Move To: %s"), *Hit.ImpactPoint.ToString());
+
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Hit.ImpactPoint);
 	}
 }

@@ -39,8 +39,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float attackCooldown = 3.0f;
 
+	UFUNCTION(BlueprintCallable)
+	void ResetAttack();
+
+	virtual void Attack();
+	virtual void AttackHit();
+
 	UPROPERTY()
 	ALostArkCharacter* targetPlayer = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Monster")
+	UAnimMontage* AttackMontage;
 
 // Bool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
@@ -49,19 +58,23 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
 	bool bCanAttack = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+	bool bIsAttacking = false;
+
+	//virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+
 public:
 
 	// Called when the game starts or when spawned
 	virtual void InitMonster(int HP, float speed, float point, float range);
 	virtual void BeginPlay() override;
-	virtual void Attack();
 	virtual void OnDamaged(float Damage);
 	virtual void DieProcess();
 
 	virtual ALostArkCharacter* FindTarget();
 	virtual void MoveToTarget(float DeltaTime);
 	virtual bool IsTargetInAttackRange() const;
-	virtual void ResetAttack();
 
 public:
 	FORCEINLINE float GetMaxHP() const { return maxHP; }
