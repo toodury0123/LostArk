@@ -2,12 +2,21 @@
 
 #include "Player/LostArkCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+
 #include "Camera/CameraComponent.h"
+
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
+
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+
+#include "Camera/CameraTypes.h"
+
 #include "Materials/Material.h"
 #include "Engine/World.h"
 
@@ -50,6 +59,16 @@ ALostArkCharacter::ALostArkCharacter()
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+	// Minimap 
+	MinimapCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MinimapCapture"));
+	MinimapCapture->SetupAttachment(RootComponent);
+
+	MinimapCapture->SetRelativeLocation(FVector(0.f, 0.f, 1500.f));
+	MinimapCapture->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+
+	MinimapCapture->ProjectionType = ECameraProjectionMode::Orthographic;
+	MinimapCapture->OrthoWidth = 3000.f;
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;

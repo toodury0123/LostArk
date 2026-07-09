@@ -50,6 +50,17 @@ private:
 	class UInputMappingContext* IMC;
 
 public:
+	// Minimap
+	UPROPERTY(VisibleAnywhere)
+	class USceneCaptureComponent2D* MinimapCapture;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> MinimapWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* MinimapWidget;
+
+public:
 	FORCEINLINE float GetAttackPoint() const { return attackPoint; }
 	FORCEINLINE float GetCurrentHP() const { return currentHP; }
 	FORCEINLINE FVector GetCharacterLocation() const { return GetActorLocation(); }
