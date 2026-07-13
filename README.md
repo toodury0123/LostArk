@@ -64,4 +64,5 @@ LostArk/
 ```
 ```
 ## 추가 콘텐츠 팩
-- Paragon : Rampage
+- Paragon: Rampage
+- Paragon: Twinblast
