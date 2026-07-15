@@ -74,7 +74,22 @@ void ABaseMonster::Attack()
 
 	GetCharacterMovement()->StopMovementImmediately();
 
-	PlayAnimMontage(AttackMontage);
+	const float MontageDuration = PlayAnimMontage(AttackMontage);
+
+	if (MontageDuration > 0.f)
+	{
+		GetWorldTimerManager().SetTimer(
+			AttackTimerHandle,
+			this,
+			&ABaseMonster::ResetAttack,
+			MontageDuration,
+			false
+		);
+	}
+	else
+	{
+		ResetAttack();
+	}
 }
 
 void ABaseMonster::AttackHit()

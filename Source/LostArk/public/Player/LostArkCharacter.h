@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Player/LostArkPlayerController.h"
 #include "InputActionValue.h"
 
 #include "LostArkCharacter.generated.h"
 
+class ALostArkPlayerController;
+class UNiagaraSystem;
+class UUserWidget;
 
 UCLASS(Blueprintable)
 class LOSTARK_API ALostArkCharacter : public ACharacter
@@ -31,7 +33,7 @@ public:
 
 public:
 // Left Click
-	void Attack(FHitResult point);
+   void Attack(const FHitResult& Point);
 // Right Click
 	//void Move(const struct FInputActionValue& inputValue);
 
@@ -73,6 +75,18 @@ private:
 	float attackPoint;
 
 	void DieProccess();
+
+
+public:
+	/***  Attack  ***/
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UNiagaraSystem* AttackEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float AttackDamage = 30.f;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float AttackRadius = 200.f;
 };
 
 	

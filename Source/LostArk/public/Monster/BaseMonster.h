@@ -18,6 +18,7 @@ public:
 	ABaseMonster();
 
 // Property
+	FTimerHandle AttackTimerHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float maxHP = 100.0f;

@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Player/LostArkCharacter.h"
+#include "Player/LostArkPlayerController.h"
+
 #include "UObject/ConstructorHelpers.h"
 
 #include "Camera/CameraComponent.h"
@@ -16,6 +18,10 @@
 #include "GameFramework/SpringArmComponent.h"
 
 #include "Camera/CameraTypes.h"
+
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Materials/Material.h"
 #include "Engine/World.h"
@@ -108,11 +114,32 @@ void ALostArkCharacter::SetCameraArmLength(float length)
 	CameraBoom->TargetArmLength = FMath::Clamp(length, 300.f, 1200.f);
 }
 
-void ALostArkCharacter::Attack(FHitResult point)
+void ALostArkCharacter::Attack(const FHitResult& Point)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Input Attack"));
 
+	if (!AttackEffect)
+		return;
 
+	// 클릭 위치에 이펙트 생성
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		AttackEffect,
+		Point.ImpactPoint
+	);
+
+	// 클릭 위치 기준 범위 데미지
+	UGameplayStatics::ApplyRadialDamage(
+		GetWorld(),
+		AttackDamage,
+		Point.ImpactPoint,
+		AttackRadius,
+		UDamageType::StaticClass(),
+		TArray<AActor*>(),
+		this,
+		this->GetController(),
+		true
+	);
 }
 
 void ALostArkCharacter::Tick(float DeltaSeconds)
