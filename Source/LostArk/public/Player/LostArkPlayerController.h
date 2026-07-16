@@ -54,7 +54,10 @@ public:
 	void Zoom(const FInputActionValue& inputValue);
 
 	bool IsMonster(AActor* Actor) const;
-	void Attack(const struct FInputActionValue& inputValue);
+	void Attack(const FHitResult& Hit);
 	
 	void Move(const struct FInputActionValue& inputValue);
+
+private:
+	void CancelCurrentMove();
 };

@@ -5,9 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
-//#include "BaseMonster.h"
-#include "Monster/NormalMonster.h"
-
 #include "Crystal.generated.h"
 
 UCLASS()
@@ -24,16 +21,18 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
-	float HP = 3;
+	int32 HP = 3;
 
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* CrystalMesh;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	void Damgaed();
+	virtual float TakeDamage(
+		float DamageAmount,
+		const FDamageEvent& DamageEvent,
+		AController* EventInstigator,
+		AActor* DamageCauser
+	) override;
 
 	void Die();
 };

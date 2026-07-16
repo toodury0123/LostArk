@@ -7,12 +7,14 @@
 ACrystal::ACrystal()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 
 	CrystalMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = CrystalMesh;
 
+	CrystalMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CrystalMesh->SetCollisionResponseToAllChannels(ECR_Block);
 }
 
 // Called when the game starts or when spawned
@@ -21,25 +23,23 @@ void ACrystal::BeginPlay()
 	Super::BeginPlay();
 }
 
-// Called every frame
-void ACrystal::Tick(float DeltaTime)
+
+float ACrystal::TakeDamage(
+	float DamageAmount,
+	const FDamageEvent& DamageEvent,
+	AController* EventInstigator,
+	AActor* DamageCauser) 
 {
-	Super::Tick(DeltaTime);
-
-	// If Is Attacked
-	// Check Damage
-}
-
-void ACrystal::Damgaed()
-{
-	// Shake Motion
-
 	HP--;
 
-	if (HP <= 0.0f)
+	if (HP <= 0)
 	{
-		Die();
+		Destroy();
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Crystal took damage: %f"), DamageAmount);
+
+	return DamageAmount;
 }
 
 void ACrystal::Die()

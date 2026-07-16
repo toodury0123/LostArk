@@ -81,10 +81,15 @@ bool ALostArkPlayerController::GetMouseWorldLocation(FVector& OutLocation)
 
 void ALostArkPlayerController::OnLeftClick(const FInputActionValue& InputValue)
 {
-	// TEST
-	FVector MouseLocation;
 
-	if (!GetMouseWorldLocation(MouseLocation))
+	FHitResult Hit;
+
+	if (!GetHitResultUnderCursor(ECC_Visibility, false, Hit))
+	{
+		return;
+	}
+
+	if (!Hit.bBlockingHit)
 	{
 		return;
 	}
@@ -96,17 +101,30 @@ void ALostArkPlayerController::OnLeftClick(const FInputActionValue& InputValue)
 		return;
 	}
 
-	FVector Direction =	MouseLocation - PlayerCharacter->GetActorLocation();
+	CancelCurrentMove();
+
+	FVector Direction =	Hit.ImpactPoint - PlayerCharacter->GetActorLocation();
 
 	Direction.Z = 0.f;
 
-	if (Direction.IsNearlyZero())
+	if (!Direction.IsNearlyZero())
+	{
+		PlayerCharacter->SetActorRotation(Direction.Rotation());
+	}
+
+	Attack(Hit);
+}
+
+void ALostArkPlayerController::Attack(const FHitResult& Hit)
+{
+	ALostArkCharacter* PlayerCharacter = Cast<ALostArkCharacter>(GetCharacter());
+
+	if (!PlayerCharacter)
 	{
 		return;
 	}
 
-	PlayerCharacter->SetActorRotation(Direction.Rotation());
-	Attack(InputValue);
+	PlayerCharacter->Attack(Hit);
 }
 
 void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
@@ -128,43 +146,6 @@ void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Hit.ImpactPoint);
 	}
-}
-
-void ALostArkCharacter::SetHP(float HP)
-{
-	currentHP = HP;
-
-	if (currentHP <= 0.0f)
-	{
-		DieProccess();
-	}
-}
-
-bool ALostArkPlayerController::IsMonster(AActor* Actor) const
-{
-	if (!Actor)
-	{
-		return false;
-	}
-
-	return Actor->ActorHasTag(TEXT("Monster"));
-}
-
-void ALostArkPlayerController::Attack(const FInputActionValue& inputValue)
-{
-	float AxisValue = inputValue.Get<float>();
-
-	ALostArkCharacter* PlayerCharacter = Cast<ALostArkCharacter>(GetCharacter());
-
-	if (!PlayerCharacter)
-	{
-		return;
-	}
-
-	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-
-	PlayerCharacter->Attack(Hit);
 }
 
 void ALostArkPlayerController::Zoom(const FInputActionValue& inputValue)
@@ -189,4 +170,29 @@ void ALostArkPlayerController::Zoom(const FInputActionValue& inputValue)
 
 	newLength = FMath::Clamp(newLength, 500.f, 1200.f);
 	PlayerCharacter->SetCameraArmLength(newLength);
+}
+
+void ALostArkPlayerController::CancelCurrentMove()
+{
+	StopMovement();
+}
+
+bool ALostArkPlayerController::IsMonster(AActor* Actor) const
+{
+	if (!Actor)
+	{
+		return false;
+	}
+
+	return Actor->ActorHasTag(TEXT("Monster"));
+}
+
+void ALostArkCharacter::SetHP(float HP)
+{
+	currentHP = HP;
+
+	if (currentHP <= 0.0f)
+	{
+		DieProccess();
+	}
 }

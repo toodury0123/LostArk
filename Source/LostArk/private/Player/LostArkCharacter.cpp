@@ -118,26 +118,40 @@ void ALostArkCharacter::Attack(const FHitResult& Point)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Input Attack"));
 
-	if (!AttackEffect)
+	if (!Point.bBlockingHit)
+	{
 		return;
+	}
 
-	// 클릭 위치에 이펙트 생성
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-		GetWorld(),
-		AttackEffect,
-		Point.ImpactPoint
-	);
+	const FVector AttackLocation = Point.ImpactPoint;
 
-	// 클릭 위치 기준 범위 데미지
+	if (AttackEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			AttackEffect,
+			AttackLocation,
+			FRotator::ZeroRotator,
+			FVector::OneVector,
+			true,
+			true,
+			ENCPoolMethod::None,
+			true
+		);
+	}
+
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
+
 	UGameplayStatics::ApplyRadialDamage(
 		GetWorld(),
 		AttackDamage,
-		Point.ImpactPoint,
+		AttackLocation,
 		AttackRadius,
 		UDamageType::StaticClass(),
-		TArray<AActor*>(),
+		IgnoreActors,
 		this,
-		this->GetController(),
+		GetController(),
 		true
 	);
 }
