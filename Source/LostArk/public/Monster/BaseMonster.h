@@ -67,9 +67,18 @@ public:
 
 public:
 
+	virtual float TakeDamage(
+		float DamageAmount,
+		const FDamageEvent& DamageEvent,
+		AController* EventInstigator,
+		AActor* DamageCauser
+	) override;
+
+
 	// Called when the game starts or when spawned
 	virtual void InitMonster(int HP, float speed, float point, float range);
 	virtual void BeginPlay() override;
+
 	virtual void OnDamaged(float Damage);
 	virtual void DieProcess();
 

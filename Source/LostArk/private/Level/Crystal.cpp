@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Monster/Crystal.h"
+#include "Level/Crystal.h"
 
 // Sets default values
 ACrystal::ACrystal()

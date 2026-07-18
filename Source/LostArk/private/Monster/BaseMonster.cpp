@@ -113,6 +113,18 @@ void ABaseMonster::ResetAttack()
 
 // ==================== Dying  Proccess ==================== //
 
+float ABaseMonster::TakeDamage(
+	float DamageAmount,
+	const FDamageEvent& DamageEvent,
+	AController* EventInstigator,
+	AActor* DamageCauser
+)
+{
+	OnDamaged(DamageAmount);
+
+	return DamageAmount;
+}
+
 void ABaseMonster::OnDamaged(float Damage)
 {
 	currentHP -= Damage;

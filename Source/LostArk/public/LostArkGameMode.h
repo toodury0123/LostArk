@@ -7,9 +7,6 @@
 
 #include "LostArkGameMode.generated.h"
 
-class ACrystal;
-class ABaseMonster;
-
 UCLASS()
 class ALostArkGameMode : public AGameModeBase
 {
@@ -17,36 +14,6 @@ class ALostArkGameMode : public AGameModeBase
 
 public:
 	ALostArkGameMode();
-
-	UPROPERTY(EditAnywhere, Category = "Chaos")
-	TSubclassOf<class ACrystal> CrystalFactory;
-
-	UPROPERTY(VisibleAnywhere, Category = "Chaos")
-	TArray<ACrystal*> Crystals;
-
-	UPROPERTY(EditAnywhere, Category = "Chaos")
-	TArray<AActor*> CrystalSpawnPoints;
-
-	UPROPERTY(VisibleAnywhere, Category = "Chaos")
-	int CrystalCount = 2;
-
-public:
-	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TSubclassOf<ABaseMonster> NormalMonsterClass;
-
-	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TSubclassOf<ABaseMonster> NamedMonsterClass;
-
-	UPROPERTY(EditAnywhere, Category = "Spawn")
-	int32 CurrentKillCount = 0;
-
-public:
-
-	UPROPERTY(VisibleAnywhere, Category = "Spawn")
-	int MaxNormalMonsterCount = 5;
-
-	UPROPERTY(VisibleAnywhere, Category = "Spawn")
-	int NamedNormalMonsterCount = 1;
 
 	//virtual void Tick(float deltaTime) override;
 };

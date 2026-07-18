@@ -4,12 +4,10 @@
 #include "Player/LostArkCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
-#include "Monster/Crystal.h"
+#include "Level/Crystal.h"
 
 ALostArkGameMode::ALostArkGameMode()
 {
-    UE_LOG(LogTemp, Warning, TEXT("LostArkGameMode 1"));
-
     static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(
         TEXT("/Game/TopDown/Blueprints/BP_TopDownCharacter")
     );
