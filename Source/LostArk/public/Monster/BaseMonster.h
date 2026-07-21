@@ -4,18 +4,30 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Player/LostArkCharacter.h"
 
 #include "BaseMonster.generated.h"
+
+class ALostArkCharacter;
+class AWaveManager;
+class UAnimMontage;
 
 UCLASS(Abstract)
 class LOSTARK_API ABaseMonster : public ACharacter
 {
 	GENERATED_BODY()
 
+private:
+	UPROPERTY();
+	AWaveManager* WaveManager = nullptr;
+
 public:
 	// Sets default values for this character's properties
 	ABaseMonster();
+
+	void SetWaveManager(AWaveManager* InWaveManager)
+	{
+		WaveManager = InWaveManager;
+	}
 
 // Property
 	FTimerHandle AttackTimerHandle;

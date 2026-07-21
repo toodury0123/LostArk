@@ -7,6 +7,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 
+#include "AIController.h"
+
+#include "Player/LostArkCharacter.h"
+#include "Level/WaveManager.h"
 
 // Sets default values
 ABaseMonster::ABaseMonster()
@@ -14,6 +18,8 @@ ABaseMonster::ABaseMonster()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	AIControllerClass = AAIController::StaticClass();
 }
 
 // Called when the game starts or when spawned
@@ -21,7 +27,14 @@ void ABaseMonster::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("Controller: %s"), *GetNameSafe(GetController()));
+	
 	FindTarget();
+
+
+	UE_LOG(LogTemp, Warning, TEXT("Monster BeginPlay / Target: %s / Controller: %s"),
+		targetPlayer ? TEXT("Valid") : TEXT("Null"),
+		GetController() ? TEXT("Valid") : TEXT("Null"));
 }
 
 // Init
@@ -107,7 +120,7 @@ void ABaseMonster::AttackHit()
 
 void ABaseMonster::ResetAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ResetAttack Called"));
+	//UE_LOG(LogTemp, Warning, TEXT("ResetAttack Called"));
 	bIsAttacking = false;
 }
 
@@ -138,6 +151,10 @@ void ABaseMonster::OnDamaged(float Damage)
 
 void ABaseMonster::DieProcess()
 {
+	if (WaveManager)
+	{
+		WaveManager->OnMonsterKilled();
+	}
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Destroy();
 	// 미구현 죽음 모션

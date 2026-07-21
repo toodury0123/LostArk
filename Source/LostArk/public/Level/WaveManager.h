@@ -9,6 +9,7 @@
 class ACrystal;
 class ABaseMonster;
 class ASpawnPoint;
+class UUserWidget;
 
 UCLASS()
 class LOSTARK_API AWaveManager : public AActor
@@ -19,8 +20,8 @@ public:
 	// Sets default values for this actor's properties
 	AWaveManager();
 
-	void OnCrystalDestroyed();
 	void OnMonsterKilled();
+	void AllMonsterKilled();
 
 protected:
 	virtual void BeginPlay() override;
@@ -29,8 +30,16 @@ private:
 	int32 CurrentWave = 0;
 	int32 AliveMonsterCount = 0;
 
+	int32 FinalWave = 3;
+	int32 GetCurrentWave() { return CurrentWave; }
+
+public:
 	void SpawnMonsterWave();
 	void SpawnNextCrystal();
+
+public:
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> GameOverWidgetClass;
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Spawn")
@@ -48,9 +57,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Chaos")
 	TArray<ASpawnPoint*> CrystalSpawnPoints;
 
-	UPROPERTY(EditAnywhere, Category = "Chaos")
-	int32 CrystalCount = 2;
-
 public:
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	TSubclassOf<ABaseMonster> NormalMonsterClass;
@@ -59,5 +65,12 @@ public:
 	TSubclassOf<ABaseMonster> NamedMonsterClass;
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
+	float MonsterSpawnRadius = 500.f;
+
+	UPROPERTY(EditAnywhere, Category = "Spawn")
 	int32 CurrentKillCount = 0;
+
+	void OnCrystalDestroyed();
+	
+	void GameOver();
 };

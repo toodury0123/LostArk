@@ -2,6 +2,7 @@
 
 
 #include "Level/Crystal.h"
+#include "Level/WaveManager.h"
 
 // Sets default values
 ACrystal::ACrystal()
@@ -37,15 +38,17 @@ float ACrystal::TakeDamage(
 		Destroy();
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Crystal took damage: %f"), DamageAmount);
+	//UE_LOG(LogTemp, Warning, TEXT("Crystal took damage: %f"), DamageAmount);
 
 	return DamageAmount;
 }
 
-void ACrystal::Die()
+void ACrystal::Destroyed()
 {
-	// Spawn Monster
+	Super::Destroyed();
 
-	AActor::Destroy();
+	if (WaveManager)
+	{
+		WaveManager->OnCrystalDestroyed();
+	}
 }
-

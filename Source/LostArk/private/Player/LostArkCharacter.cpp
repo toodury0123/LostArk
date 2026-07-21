@@ -116,7 +116,7 @@ void ALostArkCharacter::SetCameraArmLength(float length)
 
 void ALostArkCharacter::Attack(const FHitResult& Point)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Input Attack"));
+	//UE_LOG(LogTemp, Warning, TEXT("Input Attack"));
 
 	if (!Point.bBlockingHit)
 	{

@@ -7,6 +7,8 @@
 
 #include "Crystal.generated.h"
 
+class AWaveManager;
+
 UCLASS()
 class LOSTARK_API ACrystal : public AActor
 {
@@ -15,6 +17,15 @@ class LOSTARK_API ACrystal : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ACrystal();
+
+	void SetWaveManager(AWaveManager* InWaveManager)
+	{
+		WaveManager = InWaveManager;
+	}
+
+private:
+	UPROPERTY()
+	AWaveManager* WaveManager = nullptr;
 
 protected:
 	// Called when the game starts or when spawned
@@ -34,5 +45,5 @@ public:
 		AActor* DamageCauser
 	) override;
 
-	void Die();
+	virtual void Destroyed() override;
 };
