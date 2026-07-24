@@ -151,13 +151,51 @@ void ABaseMonster::OnDamaged(float Damage)
 
 void ABaseMonster::DieProcess()
 {
+	if (bIsDead)
+	{
+		return;
+	}
+
+	bIsDead = true;
+
 	if (WaveManager)
 	{
 		WaveManager->OnMonsterKilled();
 	}
+
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Destroy();
-	// 미구현 죽음 모션
+
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+
+	if (DeathMontage)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		if (AnimInstance)
+		{
+			FOnMontageEnded EndDelegate;
+			EndDelegate.BindUObject(
+				this,
+				&ABaseMonster::OnDeathMontageEnded
+			);
+
+			AnimInstance->Montage_Play(DeathMontage);
+
+			AnimInstance->Montage_SetEndDelegate(
+				EndDelegate,
+				DeathMontage
+			);
+		}
+		else
+		{
+			Destroy();
+		}
+	}
+	else
+	{
+		Destroy();
+	}
 }
 
 // ================= Move Proccess ========================= // 
@@ -205,6 +243,11 @@ bool ABaseMonster::IsTargetInAttackRange() const
 	);
 
 	return Distance <= attackRange;
+}
+
+void ABaseMonster::OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	Destroy();
 }
 
 // Called to bind functionality to input

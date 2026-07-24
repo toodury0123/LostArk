@@ -64,6 +64,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Monster")
 	UAnimMontage* AttackMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Monster")
+	UAnimMontage* DeathMontage;
+
 // Bool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
 	bool bIsDead = false;
@@ -75,7 +78,6 @@ public:
 	bool bIsAttacking = false;
 
 	//virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
-
 
 public:
 
@@ -104,6 +106,9 @@ public:
 	FORCEINLINE float CurrentMoveSpeed() const { return moveSpeed; }
 	FORCEINLINE float GetAttackRange() const { return attackRange; }
 	FORCEINLINE float GetAttackPoint() const { return attackPoint; }
+
+private:
+	void OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

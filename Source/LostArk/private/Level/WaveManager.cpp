@@ -230,7 +230,7 @@ void AWaveManager::GameOver()
 			InputMode.SetWidgetToFocus(Widget->TakeWidget());
 			PC->SetInputMode(InputMode);
 
-			UGameplayStatics::SetGamePaused(GetWorld(), true);
+			//UGameplayStatics::SetGamePaused(GetWorld(), true);
 		}
 	}
 }

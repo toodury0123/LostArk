@@ -42,10 +42,10 @@ public:
 	TSubclassOf<UUserWidget> GameOverWidgetClass;
 
 public:
-	UPROPERTY(VisibleAnywhere, Category = "Spawn")
+	UPROPERTY(EditAnywhere, Category = "Spawn")
 	int MaxNormalMonsterCount = 5;
 
-	UPROPERTY(VisibleAnywhere, Category = "Spawn")
+	UPROPERTY(EditAnywhere, Category = "Spawn")
 	int NamedNormalMonsterCount = 1;
 
 	UPROPERTY(EditAnywhere, Category = "Chaos")
