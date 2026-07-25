@@ -66,3 +66,4 @@ LostArk/
 - Paragon: Rampage
 - Paragon: Twinblast
 - Realistic Starter VFX Pack Vol 2
+- [VP] Temples of Cambodia - Ruins exterior and interior
