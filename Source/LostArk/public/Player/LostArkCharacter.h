@@ -87,6 +87,15 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float AttackRadius = 200.f;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UAnimMontage* AttackMontage1;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UAnimMontage* AttackMontage2;
+
+	int32 AttackCount = 0;
 };
 
 	

@@ -46,6 +46,15 @@ public:
 
 	void OnLeftClick(const FInputActionValue& InputValue);
 
+	// To Move Lock
+private:
+	bool bCanMove = true;
+
+	FTimerHandle MoveLockTimerHandle;
+
+	void LockMove(float Duration);
+	void UnlockMove();
+
 
 public:
 

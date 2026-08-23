@@ -48,6 +48,7 @@ void ALostArkPlayerController::BeginPlay()
             Subsystem->AddMappingContext(IMC_LostArk, 0);
         }
     }
+	LockMove(5.0f);
 }
 
 void ALostArkPlayerController::SetupInputComponent()
@@ -63,6 +64,26 @@ void ALostArkPlayerController::SetupInputComponent()
 		EnhancedInput->BindAction(ia_LeftClick, ETriggerEvent::Started, this, &ALostArkPlayerController::OnLeftClick);
 		EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Completed, this, &ALostArkPlayerController::Move);
 	}
+}
+
+void ALostArkPlayerController::LockMove(float Duration)
+{
+	bCanMove = false;
+
+	CancelCurrentMove();
+
+	GetWorldTimerManager().SetTimer(
+		MoveLockTimerHandle,
+		this,
+		&ALostArkPlayerController::UnlockMove,
+		Duration,
+		false
+	);
+}
+
+void ALostArkPlayerController::UnlockMove()
+{
+	bCanMove = true;
 }
 
 bool ALostArkPlayerController::GetMouseWorldLocation(FVector& OutLocation)
@@ -129,6 +150,11 @@ void ALostArkPlayerController::Attack(const FHitResult& Hit)
 
 void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 {
+	if (!bCanMove)
+	{
+		return;
+	}
+
 	float AxisValue = InputValue.Get<float>();
 
 	if (AxisValue <= 0.f)

@@ -116,7 +116,7 @@ void ALostArkCharacter::SetCameraArmLength(float length)
 
 void ALostArkCharacter::Attack(const FHitResult& Point)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Input Attack"));
+	UE_LOG(LogTemp, Warning, TEXT("Input Attack"));
 
 	if (!Point.bBlockingHit)
 	{
@@ -154,6 +154,32 @@ void ALostArkCharacter::Attack(const FHitResult& Point)
 		GetController(),
 		true
 	);
+
+	UAnimMontage* MontageToPlay = nullptr;
+
+	if (AttackCount == 0)
+	{
+		MontageToPlay = AttackMontage1;
+		AttackCount = 1;
+	}
+	else
+	{
+		MontageToPlay = AttackMontage2;
+		AttackCount = 0;
+	}
+
+	if (MontageToPlay)
+	{
+		float Result = PlayAnimMontage(MontageToPlay);
+
+		UE_LOG(
+			LogTemp,
+			Warning,
+			TEXT("AttackCount: %d / Montage Play Result: %f"),
+			AttackCount,
+			Result
+		);
+	}	
 }
 
 void ALostArkCharacter::Tick(float DeltaSeconds)
