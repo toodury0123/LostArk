@@ -5,6 +5,9 @@
 #include "Level/Crystal.h"
 #include "Level/SpawnPoint.h"
 
+#include "Player/LostArkCharacter.h"
+#include "Player/LostArkHUD.h"
+
 #include "Monster/BaseMonster.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -23,6 +26,8 @@ void AWaveManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	TotalMonsterCount = MaxNormalMonsterCount + MaxNormalMonsterCount;
+
 	SpawnNextCrystal();
 }
 
@@ -33,6 +38,11 @@ void AWaveManager::OnMonsterKilled()
 	UE_LOG(LogTemp, Warning,
 		TEXT("Monster Killed / AliveMonsterCount: %d"),
 		AliveMonsterCount);
+
+	if (LostArkHUD)
+	{
+		LostArkHUD->UpdateMonsterCount(AliveMonsterCount);
+	}
 
 	if (AliveMonsterCount <= 0)
 	{
@@ -52,6 +62,7 @@ void AWaveManager::AllMonsterKilled()
 
 	SpawnNextCrystal();
 }
+
 
 void AWaveManager::SpawnMonsterWave()
 {
@@ -203,6 +214,7 @@ void AWaveManager::OnCrystalDestroyed()
 	UE_LOG(LogTemp, Warning, TEXT("Crystal Destroyed"));
 }
 
+
 void AWaveManager::GameOver()
 {
 	UE_LOG(LogTemp, Error, TEXT("GameOver Called"));
@@ -232,5 +244,16 @@ void AWaveManager::GameOver()
 
 			//UGameplayStatics::SetGamePaused(GetWorld(), true);
 		}
+	}
+}
+
+void AWaveManager::SetLostArkHUD(ULostArkHUD* HUD)
+{
+	LostArkHUD = HUD;
+
+	if (LostArkHUD)
+	{
+		LostArkHUD->Init();
+		LostArkHUD->UpdateMonsterCount(AliveMonsterCount);
 	}
 }

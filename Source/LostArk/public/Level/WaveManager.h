@@ -10,6 +10,8 @@ class ACrystal;
 class ABaseMonster;
 class ASpawnPoint;
 class UUserWidget;
+class ALostArkCharacter;
+class ULostArkHUD;
 
 UCLASS()
 class LOSTARK_API AWaveManager : public AActor
@@ -43,10 +45,16 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	int MaxNormalMonsterCount = 5;
+	int32 MaxNormalMonsterCount = 5;
+
+	UPROPERTY()
+	ALostArkCharacter* Player = nullptr;
+
+	UPROPERTY()
+	ULostArkHUD* LostArkHUD = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	int NamedNormalMonsterCount = 1;
+	int32 NamedNormalMonsterCount = 1;
 
 	UPROPERTY(EditAnywhere, Category = "Chaos")
 	TSubclassOf<class ACrystal> CrystalFactory;
@@ -56,6 +64,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Chaos")
 	TArray<ASpawnPoint*> CrystalSpawnPoints;
+
+	UFUNCTION(BlueprintCallable)
+	void SetLostArkHUD(ULostArkHUD* HUD);
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Spawn")
@@ -69,6 +80,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	int32 CurrentKillCount = 0;
+
+	int32 TotalMonsterCount = 0;
+
+	int32 GetTotalMonsterCount() { return TotalMonsterCount; }
 
 	void OnCrystalDestroyed();
 	

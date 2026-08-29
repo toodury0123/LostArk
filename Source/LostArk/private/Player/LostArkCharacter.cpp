@@ -17,6 +17,9 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 
+#include "Player/LostArkHUD.h"
+#include "Level/WaveManager.h"
+
 #include "Camera/CameraTypes.h"
 
 #include "NiagaraFunctionLibrary.h"
@@ -77,7 +80,7 @@ ALostArkCharacter::ALostArkCharacter()
 	MinimapCapture->OrthoWidth = 3000.f;
 
 	// Activate ticking in order to update the cursor every frame.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;	
 	PrimaryActorTick.bStartWithTickEnabled = true;	
 }
 
@@ -100,6 +103,31 @@ void ALostArkCharacter::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("IMC_LostArk is null"));
 		return;
+	}
+
+	if (LostArkHUDClass)
+	{
+		LostArkHUD = CreateWidget<ULostArkHUD>(
+			GetWorld(),
+			LostArkHUDClass
+		);
+
+		if (LostArkHUD)
+		{
+			LostArkHUD->AddToViewport();
+
+			AWaveManager* WaveManager = Cast<AWaveManager>(
+				UGameplayStatics::GetActorOfClass(
+					GetWorld(),
+					AWaveManager::StaticClass()
+				)
+			);
+
+			if (WaveManager)
+			{
+				WaveManager->SetLostArkHUD(LostArkHUD);
+			}
+		}
 	}
 }
 

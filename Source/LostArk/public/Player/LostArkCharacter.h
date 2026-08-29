@@ -11,6 +11,7 @@
 class ALostArkPlayerController;
 class UNiagaraSystem;
 class UUserWidget;
+class ULostArkHUD;
 
 UCLASS(Blueprintable)
 class LOSTARK_API ALostArkCharacter : public ACharacter
@@ -47,17 +48,26 @@ private:
 	class USpringArmComponent* CameraBoom;
 	
 
+private:
+
 	// PlayerInput
 	class ALostArkPlayerController* PlayerController;
 	class UInputMappingContext* IMC;
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<ULostArkHUD> LostArkHUDClass;
+
+	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	ULostArkHUD* LostArkHUD = nullptr;
 
 public:
 	// Minimap
 	UPROPERTY(VisibleAnywhere)
 	class USceneCaptureComponent2D* MinimapCapture;
 
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UUserWidget> MinimapWidgetClass;
+	UPROPERTY(EditAnywhere, Category = "Minimap")
+	UTextureRenderTarget2D* MinimapRenderTarget;	
 
 	UPROPERTY()
 	UUserWidget* MinimapWidget;
