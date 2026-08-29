@@ -26,7 +26,11 @@ void AWaveManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TotalMonsterCount = MaxNormalMonsterCount + MaxNormalMonsterCount;
+	TotalMonsterCount =
+		(MaxNormalMonsterCount * FinalWave)
+		+ NamedNormalMonsterCount;
+
+	CurrentKillCount = 0;
 
 	SpawnNextCrystal();
 }
@@ -34,14 +38,16 @@ void AWaveManager::BeginPlay()
 void AWaveManager::OnMonsterKilled()
 {
 	AliveMonsterCount--;
+	CurrentKillCount++;
 
 	UE_LOG(LogTemp, Warning,
-		TEXT("Monster Killed / AliveMonsterCount: %d"),
+		TEXT("Monster Killed / CurrentWave: %d / RemainingTotal: %d"),
+		CurrentWave,
 		AliveMonsterCount);
 
 	if (LostArkHUD)
 	{
-		LostArkHUD->UpdateMonsterCount(AliveMonsterCount);
+		LostArkHUD->UpdateMonsterCount(CurrentKillCount);
 	}
 
 	if (AliveMonsterCount <= 0)
@@ -66,6 +72,7 @@ void AWaveManager::AllMonsterKilled()
 
 void AWaveManager::SpawnMonsterWave()
 {
+	// ---------- Crystal Setup ----------
 	const int32 CrystalIndex = CurrentWave;
 
 	if (!Crystals.IsValidIndex(CrystalIndex) || !Crystals[CrystalIndex])
@@ -74,6 +81,9 @@ void AWaveManager::SpawnMonsterWave()
 	}
 
 	ACrystal* CurrentCrystal = Crystals[CrystalIndex];
+
+
+	// ---------- Spawn Settings ----------
 	const FVector CrystalLocation = CurrentCrystal->GetActorLocation();
 
 	AliveMonsterCount = 0;
@@ -81,6 +91,10 @@ void AWaveManager::SpawnMonsterWave()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride =
 		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+
+
+	// ---------- Normal Monsters ----------
 
 	for (int32 i = 0; i < MaxNormalMonsterCount; ++i)
 	{
@@ -109,8 +123,10 @@ void AWaveManager::SpawnMonsterWave()
 			AliveMonsterCount++;
 		}
 	}
+	
+	// ---------- Named Monsters ----------
 
-	if (CurrentWave == FinalWave - 1)
+	if (CurrentWave == FinalWave)
 	{
 		for (int32 i = 0; i < NamedNormalMonsterCount; ++i)
 		{
@@ -199,6 +215,7 @@ void AWaveManager::SpawnNextCrystal()
 		TEXT("Crystal Spawn Success: %s"),
 		*GetNameSafe(Crystal));
 
+	AliveMonsterCount = 0;
 
 	if (Crystal)
 	{
@@ -254,6 +271,6 @@ void AWaveManager::SetLostArkHUD(ULostArkHUD* HUD)
 	if (LostArkHUD)
 	{
 		LostArkHUD->Init();
-		LostArkHUD->UpdateMonsterCount(AliveMonsterCount);
+		LostArkHUD->UpdateMonsterCount(CurrentKillCount);
 	}
 }

@@ -75,13 +75,17 @@ public:
 public:
 	FORCEINLINE float GetAttackPoint() const { return attackPoint; }
 	FORCEINLINE float GetCurrentHP() const { return currentHP; }
+	FORCEINLINE float GetCurrentMP() const { return currentMP; }
 	FORCEINLINE FVector GetCharacterLocation() const { return GetActorLocation(); }
 
 	void SetHP(float HP);
+	void SetMP(float MP);
 
 private:
 	float maxHP;
+	float maxMP;
 	float currentHP;
+	float currentMP;
 	float attackPoint;
 
 	void DieProccess();

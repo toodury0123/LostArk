@@ -19,7 +19,7 @@ void ULostArkHUD::Init()
 
     UE_LOG(LogTemp, Warning,
         TEXT("TotalMonsterCount : %d"),
-        TotalMonsterCount);
+        TotalMonsterCount); 
 }
 
 void ULostArkHUD::UpdateMonsterCount(int32 CurrentMonsterCount)
