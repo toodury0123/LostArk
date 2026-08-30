@@ -34,9 +34,12 @@ public:
 
 public:
 // Left Click
-   void Attack(const FHitResult& Point);
+	void Attack(const FHitResult& Point);
 // Right Click
 	//void Move(const struct FInputActionValue& inputValue);
+
+	// 1 입력으로 호출
+	void BombAttack(const FHitResult& Point);
 
 private:
 	/** Top down camera */
@@ -110,6 +113,31 @@ public:
 	UAnimMontage* AttackMontage2;
 
 	int32 AttackCount = 0;
+
+
+public:
+	/***  Bomb  ***/
+
+	UPROPERTY(EditAnywhere, Category = "Bomb")
+	UNiagaraSystem* BombEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Bomb")
+	float BombDamage = 30.f;
+
+	UPROPERTY(EditAnywhere, Category = "Bomb")
+	float BombRadius = 200.f;
+
+
+	UPROPERTY(EditAnywhere, Category = "Bomb")
+	UAnimMontage* BombMontage;
+
+public:
+	// AnimNotify에서 호출
+	UFUNCTION(BlueprintCallable)
+	void BombHit();
+
+private:
+	FVector BombLocation;
 };
 
 	

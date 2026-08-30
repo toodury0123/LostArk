@@ -210,6 +210,67 @@ void ALostArkCharacter::Attack(const FHitResult& Point)
 	}	
 }
 
+void ALostArkCharacter::BombAttack(const FHitResult& Point)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Input 1"));
+
+	if (!Point.bBlockingHit)
+	{
+		return;
+	}
+
+	// 마우스로 찍은 위치 저장
+	BombLocation = Point.ImpactPoint;
+
+	// 몽타주만 재생
+	if (BombMontage)
+	{
+		float Result = PlayAnimMontage(BombMontage);
+
+		UE_LOG(
+			LogTemp,
+			Warning,
+			TEXT("Bomb Play Result: %f"),
+			Result
+		);
+	}
+}
+
+void ALostArkCharacter::BombHit()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Bomb Hit"));
+
+	if (BombEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			BombEffect,
+			BombLocation,
+			FRotator::ZeroRotator,
+			FVector::OneVector,
+			true,
+			true,
+			ENCPoolMethod::None,
+			true
+		);
+	}
+
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
+
+	UGameplayStatics::ApplyRadialDamage(
+		GetWorld(),
+		BombDamage,
+		BombLocation,
+		BombRadius,
+		UDamageType::StaticClass(),
+		IgnoreActors,
+		this,
+		GetController(),
+		true
+	);
+}
+
 void ALostArkCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);

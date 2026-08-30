@@ -37,6 +37,8 @@ public:
 	UInputAction* ia_RightClick;
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* ia_MouseWheel;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ia_Bomb;
 
 	bool bLeftClickDown = false;
 	bool bRightClickDown = false;
@@ -66,6 +68,7 @@ public:
 	void Attack(const FHitResult& Hit);
 	
 	void Move(const struct FInputActionValue& inputValue);
+	void OnBomb();
 
 private:
 	void CancelCurrentMove();

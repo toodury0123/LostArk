@@ -63,6 +63,8 @@ void ALostArkPlayerController::SetupInputComponent()
 		// ¹Ì±¸Çö
 		EnhancedInput->BindAction(ia_LeftClick, ETriggerEvent::Started, this, &ALostArkPlayerController::OnLeftClick);
 		EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Completed, this, &ALostArkPlayerController::Move);
+		EnhancedInput->BindAction(ia_Bomb, ETriggerEvent::Started, this, &ALostArkPlayerController::OnBomb
+		);
 	}
 }
 
@@ -196,6 +198,25 @@ void ALostArkPlayerController::Zoom(const FInputActionValue& inputValue)
 
 	newLength = FMath::Clamp(newLength, 500.f, 1200.f);
 	PlayerCharacter->SetCameraArmLength(newLength);
+}
+
+void ALostArkPlayerController::OnBomb()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnBomb Called"));
+
+
+	FHitResult Hit;
+
+	GetHitResultUnderCursor(
+		ECC_Visibility,
+		false,
+		Hit
+	);
+
+	if (ALostArkCharacter* LostArkCharacter = Cast<ALostArkCharacter>(GetPawn()))
+	{
+		LostArkCharacter->BombAttack(Hit);
+	}
 }
 
 void ALostArkPlayerController::CancelCurrentMove()
