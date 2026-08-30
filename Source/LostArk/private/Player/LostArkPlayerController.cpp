@@ -60,9 +60,7 @@ void ALostArkPlayerController::SetupInputComponent()
 	{
 		EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Triggered, this, &ALostArkPlayerController::Move);
 		EnhancedInput->BindAction(ia_MouseWheel, ETriggerEvent::Triggered, this, &ALostArkPlayerController::Zoom);
-		// 미구현
-		EnhancedInput->BindAction(ia_LeftClick, ETriggerEvent::Started, this, &ALostArkPlayerController::OnLeftClick);
-		EnhancedInput->BindAction(ia_RightClick, ETriggerEvent::Completed, this, &ALostArkPlayerController::Move);
+		EnhancedInput->BindAction(ia_LeftClick, ETriggerEvent::Triggered, this, &ALostArkPlayerController::OnLeftClick);
 		EnhancedInput->BindAction(ia_Bomb, ETriggerEvent::Started, this, &ALostArkPlayerController::OnBomb
 		);
 	}
@@ -104,7 +102,21 @@ bool ALostArkPlayerController::GetMouseWorldLocation(FVector& OutLocation)
 
 void ALostArkPlayerController::OnLeftClick(const FInputActionValue& InputValue)
 {
+	ALostArkCharacter* PlayerCharacter =
+		Cast<ALostArkCharacter>(GetPawn());
 
+	if (!PlayerCharacter)
+	{
+		return;
+	}
+
+	// 스킬 사용 중이면 좌클릭 입력 차단
+	if (PlayerCharacter->IsActionLocked())
+	{
+		UE_LOG(LogTemp, Error, TEXT("LEFT CLICK BLOCKED BY ACTION LOCK"));
+		return;
+	}
+	
 	FHitResult Hit;
 
 	if (!GetHitResultUnderCursor(ECC_Visibility, false, Hit))
@@ -117,22 +129,18 @@ void ALostArkPlayerController::OnLeftClick(const FInputActionValue& InputValue)
 		return;
 	}
 
-	ALostArkCharacter* PlayerCharacter = Cast<ALostArkCharacter>(GetCharacter());
-
-	if (!PlayerCharacter)
-	{
-		return;
-	}
-
 	CancelCurrentMove();
 
-	FVector Direction =	Hit.ImpactPoint - PlayerCharacter->GetActorLocation();
+	FVector Direction =
+		Hit.ImpactPoint - PlayerCharacter->GetActorLocation();
 
 	Direction.Z = 0.f;
 
 	if (!Direction.IsNearlyZero())
 	{
-		PlayerCharacter->SetActorRotation(Direction.Rotation());
+		PlayerCharacter->SetActorRotation(
+			Direction.Rotation()
+		);
 	}
 
 	Attack(Hit);
@@ -152,12 +160,43 @@ void ALostArkPlayerController::Attack(const FHitResult& Hit)
 
 void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 {
+	UE_LOG(LogTemp, Error,
+		TEXT("MOVE CALLED / VALUE = %f"),
+		InputValue.Get<float>());
+
+	ALostArkCharacter* PlayerCharacter =
+		Cast<ALostArkCharacter>(GetPawn());
+
+	if (!PlayerCharacter)
+	{
+		return;
+	}
+
+	UE_LOG(
+		LogTemp,
+		Error,
+		TEXT("Move / MovementLock=%d / ActionLock=%d / CanMove=%d"),
+		PlayerCharacter->IsMovementLocked(),
+		PlayerCharacter->IsActionLocked(),
+		bCanMove
+	);
+
 	if (!bCanMove)
 	{
 		return;
 	}
 
-	float AxisValue = InputValue.Get<float>();
+	if (PlayerCharacter->IsMovementLocked())
+	{
+		return;
+	}
+
+	if (PlayerCharacter->IsActionLocked())
+	{
+		return;
+	}
+
+	const float AxisValue = InputValue.Get<float>();
 
 	if (AxisValue <= 0.f)
 	{
@@ -165,15 +204,28 @@ void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 	}
 
 	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
-	if (Hit.bBlockingHit)
+	if (!GetHitResultUnderCursor(ECC_Visibility, false, Hit))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("MOVE HOLD"));
-		UE_LOG(LogTemp, Warning, TEXT("Move To: %s"), *Hit.ImpactPoint.ToString());
-
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Hit.ImpactPoint);
+		return;
 	}
+
+	if (!Hit.bBlockingHit)
+	{
+		return;
+	}
+
+	UE_LOG(
+		LogTemp,
+		Warning,
+		TEXT("Move To: %s"),
+		*Hit.ImpactPoint.ToString()
+	);
+
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(
+		this,
+		Hit.ImpactPoint
+	);
 }
 
 void ALostArkPlayerController::Zoom(const FInputActionValue& inputValue)
@@ -202,21 +254,45 @@ void ALostArkPlayerController::Zoom(const FInputActionValue& inputValue)
 
 void ALostArkPlayerController::OnBomb()
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnBomb Called"));
+	UE_LOG(LogTemp, Error, TEXT("BOMB CALLED"));
 
+	ALostArkCharacter* LostArkCharacter =
+		Cast<ALostArkCharacter>(GetPawn());
+
+	if (!LostArkCharacter)
+	{
+		return;
+	}
+
+	// 다른 행동 중이면 Bomb 입력 차단
+	if (LostArkCharacter->IsActionLocked())
+	{
+		UE_LOG(LogTemp, Error, TEXT("MOVE BLOCKED - ACTION LOCK"));
+		return;
+	}
+
+	// Bomb 쿨타임 중이면 1 입력 차단
+	if (!LostArkCharacter->CanBomb())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BOMB INPUT BLOCKED - COOLDOWN"));
+		return;
+	}
 
 	FHitResult Hit;
 
-	GetHitResultUnderCursor(
-		ECC_Visibility,
-		false,
-		Hit
-	);
-
-	if (ALostArkCharacter* LostArkCharacter = Cast<ALostArkCharacter>(GetPawn()))
+	if (!GetHitResultUnderCursor(ECC_Visibility, false, Hit))
 	{
-		LostArkCharacter->BombAttack(Hit);
+		return;
 	}
+
+	if (!Hit.bBlockingHit)
+	{
+		return;
+	}
+
+	CancelCurrentMove();
+
+	LostArkCharacter->BombAttack(Hit);
 }
 
 void ALostArkPlayerController::CancelCurrentMove()
@@ -232,14 +308,4 @@ bool ALostArkPlayerController::IsMonster(AActor* Actor) const
 	}
 
 	return Actor->ActorHasTag(TEXT("Monster"));
-}
-
-void ALostArkCharacter::SetHP(float HP)
-{
-	currentHP = HP;
-
-	if (currentHP <= 0.0f)
-	{
-		DieProccess();
-	}
 }

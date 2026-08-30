@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Level/WaveManager.h"
+#include "Components/ProgressBar.h"
 
 void ULostArkHUD::Init()
 {
@@ -41,4 +42,14 @@ void ULostArkHUD::UpdateMonsterCount(int32 CurrentMonsterCount)
             TEXT("Monster Gauge Percent: %f"),
             Percent);
     }
+}
+
+void ULostArkHUD::UpdateBombCooldown(float Percent)
+{
+    if (!Skill_1_CoolDownBar)
+    {
+        return;
+    }
+
+    Skill_1_CoolDownBar->SetPercent(Percent);
 }
