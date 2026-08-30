@@ -219,10 +219,17 @@ void ALostArkCharacter::BombAttack(const FHitResult& Point)
 		return;
 	}
 
-	// 마우스로 찍은 위치 저장
 	BombLocation = Point.ImpactPoint;
 
-	// 몽타주만 재생
+	// 마우스 방향으로 회전
+	FVector Direction = BombLocation - GetActorLocation();
+	Direction.Z = 0.f;
+
+	if (!Direction.IsNearlyZero())
+	{
+		SetActorRotation(Direction.Rotation());
+	}
+
 	if (BombMontage)
 	{
 		float Result = PlayAnimMontage(BombMontage);
@@ -240,8 +247,17 @@ void ALostArkCharacter::BombHit()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Bomb Hit"));
 
+	UE_LOG(LogTemp, Warning,
+		TEXT("BombLocation: X=%f Y=%f Z=%f"),
+		BombLocation.X,
+		BombLocation.Y,
+		BombLocation.Z
+	);
+
 	if (BombEffect)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("BombEffect Valid"));
+
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
 			BombEffect,
@@ -253,6 +269,10 @@ void ALostArkCharacter::BombHit()
 			ENCPoolMethod::None,
 			true
 		);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("BombEffect NULL"));
 	}
 
 	TArray<AActor*> IgnoreActors;

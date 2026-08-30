@@ -122,10 +122,10 @@ public:
 	UNiagaraSystem* BombEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Bomb")
-	float BombDamage = 30.f;
+	float BombDamage = 100.f;
 
 	UPROPERTY(EditAnywhere, Category = "Bomb")
-	float BombRadius = 200.f;
+	float BombRadius = 500.f;
 
 
 	UPROPERTY(EditAnywhere, Category = "Bomb")
