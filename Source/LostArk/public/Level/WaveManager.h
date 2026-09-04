@@ -29,7 +29,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	int32 CurrentWave = 0;
+	int32 CurrentWave = 1;
 	int32 AliveMonsterCount = 0;
 
 	int32 FinalWave = 3;

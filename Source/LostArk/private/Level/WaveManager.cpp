@@ -60,7 +60,7 @@ void AWaveManager::AllMonsterKilled()
 {
 	CurrentWave++;
 
-	if (CurrentWave >= FinalWave)
+	if (CurrentWave > FinalWave)
 	{
 		GameOver();
 		return;
@@ -73,7 +73,12 @@ void AWaveManager::AllMonsterKilled()
 void AWaveManager::SpawnMonsterWave()
 {
 	// ---------- Crystal Setup ----------
-	const int32 CrystalIndex = CurrentWave;
+	const int32 CrystalIndex = CurrentWave - 1;
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("SpawnMonsterWave / CurrentWave: %d / FinalWave: %d"),
+		CurrentWave,
+		FinalWave);
 
 	if (!Crystals.IsValidIndex(CrystalIndex) || !Crystals[CrystalIndex])
 	{
@@ -151,6 +156,9 @@ void AWaveManager::SpawnMonsterWave()
 
 			if (SpawnedMonster)
 			{
+
+				UE_LOG(LogTemp, Error, TEXT("RARE MONSTER SPAWN"));
+
 				SpawnedMonster->SetWaveManager(this);
 				AliveMonsterCount++;
 			}
@@ -166,21 +174,22 @@ void AWaveManager::SpawnNextCrystal()
 		FinalWave,
 		CrystalSpawnPoints.Num());
 
-	if (CurrentWave >= FinalWave)
+	if (CurrentWave > FinalWave)
 	{
-		UE_LOG(LogTemp, Error, TEXT("CurrentWave >= FinalWave"));
+		UE_LOG(LogTemp, Error, TEXT("CurrentWave > FinalWave"));
 		return;
 	}
+	const int32 SpawnPointIndex = CurrentWave - 1;
 
-	if (!CrystalSpawnPoints.IsValidIndex(CurrentWave))
+	if (!CrystalSpawnPoints.IsValidIndex(SpawnPointIndex))
 	{
 		UE_LOG(LogTemp, Error,
 			TEXT("Invalid SpawnPoint Index: %d"),
-			CurrentWave);
+			SpawnPointIndex);
 		return;
 	}
 
-	ASpawnPoint* SpawnPoint = CrystalSpawnPoints[CurrentWave];
+	ASpawnPoint* SpawnPoint = CrystalSpawnPoints[SpawnPointIndex];
 
 	if (!SpawnPoint)
 	{

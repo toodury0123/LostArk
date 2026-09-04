@@ -46,7 +46,7 @@ void ACrystal::StartShake()
 	GetWorldTimerManager().SetTimer(
 		ShakeTimerHandle,
 		this,
-		&ACrystal::UpdateShake,
+		&ACrystal::UpdateShake,	
 		0.02f,
 		true
 	);
