@@ -278,10 +278,21 @@ void ALostArkCharacter::BombAttack(const FHitResult& Point)
 	bCanBomb = false;
 	bBombAttackActive = true;
 
+
+	UE_LOG(
+		LogTemp,
+		Error,
+		TEXT("BOMB START / CoolTime=%f / LockDuration=%f / CanBomb=%d"),
+		BombCoolTime,
+		BombLockDuration,
+		bCanBomb
+	);
+
 	// Bomb 사용 중 모든 행동 입력 잠금
 	bActionLocked = true;
 
 	UE_LOG(LogTemp, Error, TEXT("ACTION LOCK TRUE"));
+
 
 	GetWorldTimerManager().SetTimer(
 		BombCoolTimeTimerHandle,
@@ -305,12 +316,33 @@ void ALostArkCharacter::BombAttack(const FHitResult& Point)
 		SetActorRotation(Direction.Rotation());
 	}
 
-	if (BombMontage)
-	{
-		UE_LOG(LogTemp, Error, TEXT("### BOMB MONTAGE FROM C++ ###"));
+	FTimerHandle  TestTimer;
 
-		PlayAnimMontage(BombMontage);
-	}
+	GetWorldTimerManager().SetTimer(
+		TestTimer,
+		[this]()
+		{
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+			if (!AnimInstance || !BombMontage)
+			{
+				return;
+			}
+
+			UE_LOG(
+				LogTemp,
+				Error,
+				TEXT(
+					"BOMB CHECK / Playing=%d / Position=%f / Length=%f"
+				),
+				AnimInstance->Montage_IsPlaying(BombMontage),
+				AnimInstance->Montage_GetPosition(BombMontage),
+				BombMontage->GetPlayLength()
+			);
+		},
+		1.3f,
+		false
+	);
 }
 
 

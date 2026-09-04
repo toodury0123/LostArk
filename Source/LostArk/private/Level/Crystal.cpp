@@ -1,15 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Level/Crystal.h"
 #include "Level/WaveManager.h"
 
-// Sets default values
 ACrystal::ACrystal()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
 
 	CrystalMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = CrystalMesh;
@@ -18,19 +12,21 @@ ACrystal::ACrystal()
 	CrystalMesh->SetCollisionResponseToAllChannels(ECR_Block);
 }
 
-// Called when the game starts or when spawned
 void ACrystal::BeginPlay()
 {
 	Super::BeginPlay();
-}
 
+	OriginalMeshLocation = CrystalMesh->GetRelativeLocation();
+}
 
 float ACrystal::TakeDamage(
 	float DamageAmount,
 	const FDamageEvent& DamageEvent,
 	AController* EventInstigator,
-	AActor* DamageCauser) 
+	AActor* DamageCauser)
 {
+	StartShake();
+
 	HP--;
 
 	if (HP <= 0)
@@ -38,9 +34,50 @@ float ACrystal::TakeDamage(
 		Destroy();
 	}
 
-	//UE_LOG(LogTemp, Warning, TEXT("Crystal took damage: %f"), DamageAmount);
-
 	return DamageAmount;
+}
+
+void ACrystal::StartShake()
+{
+	// 연속으로 공격받았을 경우 기존 Shake 초기화
+	GetWorldTimerManager().ClearTimer(ShakeTimerHandle);
+	GetWorldTimerManager().ClearTimer(ShakeEndTimerHandle);
+
+	GetWorldTimerManager().SetTimer(
+		ShakeTimerHandle,
+		this,
+		&ACrystal::UpdateShake,
+		0.02f,
+		true
+	);
+
+	GetWorldTimerManager().SetTimer(
+		ShakeEndTimerHandle,
+		this,
+		&ACrystal::EndShake,
+		ShakeDuration,
+		false
+	);
+}
+
+void ACrystal::UpdateShake()
+{
+	const FVector ShakeOffset(
+		FMath::RandRange(-ShakeStrength, ShakeStrength),
+		FMath::RandRange(-ShakeStrength, ShakeStrength),
+		0.f
+	);
+
+	CrystalMesh->SetRelativeLocation(
+		OriginalMeshLocation + ShakeOffset
+	);
+}
+
+void ACrystal::EndShake()
+{
+	GetWorldTimerManager().ClearTimer(ShakeTimerHandle);
+
+	CrystalMesh->SetRelativeLocation(OriginalMeshLocation);
 }
 
 void ACrystal::Destroyed()

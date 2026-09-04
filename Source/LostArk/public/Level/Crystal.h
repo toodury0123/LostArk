@@ -22,22 +22,36 @@ public:
 	{
 		WaveManager = InWaveManager;
 	}
-
 private:
 	UPROPERTY()
 	AWaveManager* WaveManager = nullptr;
 
+	// Shake
+	FVector OriginalMeshLocation;
+
+	FTimerHandle ShakeTimerHandle;
+	FTimerHandle ShakeEndTimerHandle;
+
+	void StartShake();
+	void UpdateShake();
+	void EndShake();
+
+	UPROPERTY(EditAnywhere, Category = "Shake")
+	float ShakeDuration = 0.15f;
+
+	UPROPERTY(EditAnywhere, Category = "Shake")
+	float ShakeStrength = 10.f;
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	int32 HP = 3;
 
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* CrystalMesh;
 
-public:	
+public:
 	virtual float TakeDamage(
 		float DamageAmount,
 		const FDamageEvent& DamageEvent,
