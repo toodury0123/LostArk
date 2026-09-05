@@ -97,7 +97,8 @@ ALostArkCharacter::ALostArkCharacter()
 	MinimapCapture->ProjectionType =
 		ECameraProjectionMode::Orthographic;
 
-	MinimapCapture->OrthoWidth = 3000.f;
+	MinimapCapture->OrthoWidth = 500.f;
+	MinimapCapture->ShowFlags.SetFog(false);
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -380,15 +381,15 @@ void ALostArkCharacter::BombHit()
 		TEXT("Bomb Hit")
 	);
 
-	DrawDebugSphere(
-		GetWorld(),
-		BombLocation,
-		BombRadius,
-		32,
-		FColor::Red,
-		false,
-		2.f
-	);
+	//DrawDebugSphere(
+	//	GetWorld(),
+	//	BombLocation,
+	//	BombRadius,
+	//	32,
+	//	FColor::Red,
+	//	false,
+	//	2.f
+	//);
 
 	if (BombEffect)
 	{
