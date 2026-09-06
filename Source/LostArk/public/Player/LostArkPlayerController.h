@@ -8,6 +8,7 @@
 
 class UInputMappingContext;
 class UInputAction;
+class UNiagaraSystem;
 
 #include "LostArkPlayerController.generated.h"
 
@@ -38,8 +39,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* ia_MouseWheel;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputAction* ia_Bomb;
+	UInputAction* ia_Bomb;	
 
+	UPROPERTY(EditAnywhere, Category = "Move")
+	UNiagaraSystem* MoveClickEffect = nullptr;
+	
 	bool bLeftClickDown = false;
 	bool bRightClickDown = false;
 

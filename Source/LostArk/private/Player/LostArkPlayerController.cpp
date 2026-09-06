@@ -10,6 +10,9 @@
 #include "InputAction.h"
 #include "InputMappingContext.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
+
 #include "GameFramework/SpringArmComponent.h"
 
 #include "Player/LostArkCharacter.h"
@@ -213,6 +216,15 @@ void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 	if (!Hit.bBlockingHit)
 	{
 		return;
+	}
+
+	if (MoveClickEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			MoveClickEffect,
+			Hit.ImpactPoint
+		);
 	}
 
 	UE_LOG(

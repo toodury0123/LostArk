@@ -431,8 +431,6 @@ void ALostArkCharacter::LockMovement(
 	float Duration
 )
 {
-	UE_LOG(LogTemp, Error, TEXT("### LOCK MOVEMENT CALLED ###"));
-
 	bMovementLocked = true;
 
 	// 기존 SimpleMove 취소
