@@ -8,7 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
-#include "InputMappingContext.h"
+#include "InputMappingContext.h"	
 
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
