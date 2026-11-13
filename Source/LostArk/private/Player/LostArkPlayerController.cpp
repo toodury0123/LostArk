@@ -114,7 +114,7 @@ void ALostArkPlayerController::OnLeftClick(const FInputActionValue& InputValue)
 	}
 
 	// 스킬 사용 중이면 좌클릭 입력 차단
-	if (PlayerCharacter->IsActionLocked())
+	if (PlayerCharacter->IsActionLocked() || PlayerCharacter->IsMovementLocked())
 	{
 		UE_LOG(LogTemp, Error, TEXT("LEFT CLICK BLOCKED BY ACTION LOCK"));
 		return;

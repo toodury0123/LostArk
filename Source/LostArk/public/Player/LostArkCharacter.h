@@ -8,6 +8,7 @@
 
 #include "LostArkCharacter.generated.h"
 
+class UCombatComponent;
 class ALostArkPlayerController;
 class UNiagaraSystem;
 class UUserWidget;
@@ -21,13 +22,14 @@ class USpringArmComponent;
 
 UCLASS(Blueprintable)
 class LOSTARK_API ALostArkCharacter : public ACharacter
-{
+{	
 	GENERATED_BODY()
 
 public:
 	ALostArkCharacter();
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaSeconds) override;
 
 	FORCEINLINE UCameraComponent* GetTopDownCameraComponent() const
@@ -156,6 +158,10 @@ private:
 
 
 public:
+	// Keep attack tuning on the character for existing Blueprint serialization.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack")
+	UCombatComponent* CombatComponent;
+
 	/*** Attack ***/
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
@@ -219,6 +225,8 @@ private:
 private:
 	bool bMovementLocked = false;
 	bool bActionLocked = false;
+	FTimerHandle ActionLockTimerHandle;
+	void UnlockAction();
 
 public:
 	bool IsActionLocked() const

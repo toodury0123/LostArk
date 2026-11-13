@@ -1,6 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Player/LostArkCharacter.h"
+#include "Combat/CombatComponent.h"
+#include "TimerManager.h"
+#include "GameFramework/DamageType.h"
 #include "Player/LostArkPlayerController.h"
 
 #include "UObject/ConstructorHelpers.h"
@@ -31,6 +34,8 @@
 
 ALostArkCharacter::ALostArkCharacter()
 {
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
 
 	bUseControllerRotationPitch = false;
@@ -174,7 +179,8 @@ void ALostArkCharacter::Tick(float DeltaSeconds)
 			GetWorldTimerManager().GetTimerRemaining(BombCoolTimeTimerHandle);
 
 		const float Percent =
-			FMath::Clamp(Remaining / BombCoolTime, 0.f, 1.f);
+			(FMath::IsFinite(BombCoolTime) && BombCoolTime > 0.f)
+			? FMath::Clamp(Remaining / BombCoolTime, 0.f, 1.f) : 0.f;
 
 		LostArkHUD->UpdateBombCooldown(Percent);
 	}
@@ -199,7 +205,7 @@ void ALostArkCharacter::SetCameraArmLength(float Length)
 
 void ALostArkCharacter::Attack(const FHitResult& Point)
 {
-	if (!Point.bBlockingHit)
+	if (!Point.bBlockingHit || bActionLocked || bMovementLocked || !IsValid(CombatComponent))
 	{
 		return;
 	}
@@ -207,38 +213,7 @@ void ALostArkCharacter::Attack(const FHitResult& Point)
 	// 이동 경직
 	LockMovement(AttackLockDuration);
 
-	const FVector AttackLocation =
-		Point.ImpactPoint;
-
-	if (AttackEffect)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(),
-			AttackEffect,
-			AttackLocation,
-			FRotator::ZeroRotator,
-			FVector::OneVector,
-			true,
-			true,
-			ENCPoolMethod::None,
-			true
-		);
-	}
-
-	TArray<AActor*> IgnoreActors;
-	IgnoreActors.Add(this);
-
-	UGameplayStatics::ApplyRadialDamage(
-		GetWorld(),
-		AttackDamage,
-		AttackLocation,
-		AttackRadius,
-		UDamageType::StaticClass(),
-		IgnoreActors,
-		this,
-		GetController(),
-		true
-	);
+	CombatComponent->ExecuteBasicAttack(Point.ImpactPoint, AttackDamage, AttackRadius, AttackEffect);
 
 	UAnimMontage* MontageToPlay = nullptr;
 
@@ -266,7 +241,7 @@ void ALostArkCharacter::Attack(const FHitResult& Point)
 
 void ALostArkCharacter::BombAttack(const FHitResult& Point)
 {
-	if (!Point.bBlockingHit)
+	if (!Point.bBlockingHit || bActionLocked || bMovementLocked)
 	{
 		return;
 	}
@@ -291,6 +266,11 @@ void ALostArkCharacter::BombAttack(const FHitResult& Point)
 
 	// Bomb 사용 중 모든 행동 입력 잠금
 	bActionLocked = true;
+	// Movement may be released separately; Bomb owns its own action deadline.
+	const float ActionDuration = FMath::IsFinite(BombLockDuration)
+		? FMath::Max(BombLockDuration, KINDA_SMALL_NUMBER) : KINDA_SMALL_NUMBER;
+	GetWorldTimerManager().SetTimer(ActionLockTimerHandle, this,
+		&ALostArkCharacter::UnlockAction, ActionDuration, false);
 
 	UE_LOG(LogTemp, Error, TEXT("ACTION LOCK TRUE"));
 
@@ -299,7 +279,7 @@ void ALostArkCharacter::BombAttack(const FHitResult& Point)
 		BombCoolTimeTimerHandle,
 		this,
 		&ALostArkCharacter::ResetBombCoolTime,
-		BombCoolTime,
+		FMath::IsFinite(BombCoolTime) ? FMath::Max(BombCoolTime, KINDA_SMALL_NUMBER) : KINDA_SMALL_NUMBER,
 		false
 	);
 
@@ -317,33 +297,8 @@ void ALostArkCharacter::BombAttack(const FHitResult& Point)
 		SetActorRotation(Direction.Rotation());
 	}
 
-	FTimerHandle  TestTimer;
+	// Bomb montage playback remains owned by the existing Blueprint/AnimBP.
 
-	GetWorldTimerManager().SetTimer(
-		TestTimer,
-		[this]()
-		{
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-			if (!AnimInstance || !BombMontage)
-			{
-				return;
-			}
-
-			UE_LOG(
-				LogTemp,
-				Error,
-				TEXT(
-					"BOMB CHECK / Playing=%d / Position=%f / Length=%f"
-				),
-				AnimInstance->Montage_IsPlaying(BombMontage),
-				AnimInstance->Montage_GetPosition(BombMontage),
-				BombMontage->GetPlayLength()
-			);
-		},
-		1.3f,
-		false
-	);
 }
 
 
@@ -431,6 +386,11 @@ void ALostArkCharacter::LockMovement(
 	float Duration
 )
 {
+	const float SafeDuration = FMath::IsFinite(Duration)
+		? FMath::Max(Duration, KINDA_SMALL_NUMBER) : KINDA_SMALL_NUMBER;
+	// A repeated lock must not shorten an existing longer lock.
+	const float LockDuration = FMath::Max(SafeDuration,
+		GetWorldTimerManager().GetTimerRemaining(MovementLockTimerHandle));
 	bMovementLocked = true;
 
 	// 기존 SimpleMove 취소
@@ -462,7 +422,7 @@ void ALostArkCharacter::LockMovement(
 		MovementLockTimerHandle,
 		this,
 		&ALostArkCharacter::EnableMovement,
-		Duration,
+		LockDuration,
 		false
 	);
 }
@@ -470,14 +430,22 @@ void ALostArkCharacter::LockMovement(
 
 void ALostArkCharacter::EnableMovement()
 {
+	GetWorldTimerManager().ClearTimer(MovementLockTimerHandle);
 	bMovementLocked = false;
-	bActionLocked = false;
-
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-	GetCharacterMovement()
-		->SetMovementMode(
-			MOVE_Walking
-		);
+}
+
+void ALostArkCharacter::UnlockAction()
+{
+	bActionLocked = false;
+}
+
+void ALostArkCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	GetWorldTimerManager().ClearTimer(MovementLockTimerHandle);
+	GetWorldTimerManager().ClearTimer(ActionLockTimerHandle);
+	GetWorldTimerManager().ClearTimer(BombCoolTimeTimerHandle);
+	Super::EndPlay(EndPlayReason);
 }
 
 

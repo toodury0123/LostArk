@@ -28,7 +28,9 @@ void ABaseMonster::BeginPlay()
 	Super::BeginPlay();
 
 	UE_LOG(LogTemp, Warning, TEXT("Controller: %s"), *GetNameSafe(GetController()));
-	
+
+	currentHP = maxHP;
+
 	FindTarget();
 
 
