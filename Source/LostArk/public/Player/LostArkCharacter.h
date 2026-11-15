@@ -22,6 +22,7 @@ class USpringArmComponent;
 
 UCLASS(Blueprintable)
 class LOSTARK_API ALostArkCharacter : public ACharacter
+
 {	
 	GENERATED_BODY()
 
@@ -50,6 +51,22 @@ public:
 
 	// Press 1
 	void BombAttack(const FHitResult& Point);
+
+	// 마우스 방향으로 슬라이딩하며 장애물과 이동 가능 영역 경계에서 멈춘다.
+	UFUNCTION(BlueprintCallable, Category = "Slide")
+	void Slide();
+
+	// 장애물이 없을 때 이동할 거리(cm).
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slide", meta = (ClampMin = "0.0", Units = "cm"))
+	float SlideDistance = 500.f;
+
+	// 슬라이딩 이동에 걸리는 시간(초).
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slide", meta = (ClampMin = "0.01", Units = "s"))
+	float SlideDuration = 0.4f;
+
+	// 이동은 코드가 담당하므로 루트 이동이 없는 슬라이딩 Montage를 지정한다.
+	UPROPERTY(EditAnywhere, Category = "Slide")
+	TObjectPtr<UAnimMontage> SlideMontage = nullptr;
 
 	// Bomb 사용 가능 여부
 	bool CanBomb() const
@@ -224,6 +241,14 @@ private:
 
 private:
 	bool bMovementLocked = false;
+	// 진행 중 설정값이 바뀌어도 시작 시 정한 거리와 시간을 유지한다.
+	bool bSliding = false;
+	FVector SlideDirection = FVector::ZeroVector;
+	// 슬라이딩 중 직선 경로가 NavMesh 밖으로 나가는지 확인할 기준점.
+	FVector SlideNavLocation = FVector::ZeroVector;
+	float SlideRemainingDistance = 0.f;
+	float SlideRemainingTime = 0.f;
+	float SlideSpeed = 0.f;
 	bool bActionLocked = false;
 	FTimerHandle ActionLockTimerHandle;
 	void UnlockAction();

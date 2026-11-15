@@ -25,6 +25,7 @@ public:
 	ALostArkPlayerController();
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void SetupInputComponent() override;
 
 	FORCEINLINE UInputMappingContext* GetIMC() const { return IMC_LostArk; }
@@ -44,6 +45,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Move")
 	UNiagaraSystem* MoveClickEffect = nullptr;
 	
+	// 시작 후 이동과 슬라이딩을 기다리는 시간. 0초이면 즉시 허용한다.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Move", meta = (ClampMin = "0.0", Units = "s"))
+	float StartDelay = 3.f;
+
 	bool bLeftClickDown = false;
 	bool bRightClickDown = false;
 
@@ -51,16 +56,6 @@ public:
 	FORCEINLINE bool IsRightClickDown() const { return bRightClickDown; }
 
 	void OnLeftClick(const FInputActionValue& InputValue);
-
-	// To Move Lock
-private:
-	bool bCanMove = true;
-
-	FTimerHandle MoveLockTimerHandle;
-
-	void LockMove(float Duration);
-	void UnlockMove();
-
 
 public:
 
@@ -73,7 +68,15 @@ public:
 	
 	void Move(const struct FInputActionValue& inputValue);
 	void OnBomb();
+	// 스페이스바 입력으로 마우스 방향 슬라이딩을 요청한다.
+	void OnSlide();
 
 private:
+	// 시작 대기 중에만 사용하는 이동 잠금과 해제 타이머.
+	bool bCanMove = true;
+	FTimerHandle MoveLockTimerHandle;
+	void LockMove(float Duration);
+	void UnlockMove();
+
 	void CancelCurrentMove();
 };

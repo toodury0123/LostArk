@@ -51,12 +51,19 @@ void ALostArkPlayerController::BeginPlay()
             Subsystem->AddMappingContext(IMC_LostArk, 0);
         }
     }
-	LockMove(5.0f);
+	// ì—ë””í„°ì—ì„œ ì •í•œ ì‹œì‘ ëŒ€ê¸° ì‹œê°„ ë™ì•ˆ ì´ë™ê³¼ ìŠ¬ë¼ì´ë”©ì„ ì ê·¼ë‹¤.
+	LockMove(StartDelay);
 }
 
 void ALostArkPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
+
+	// ½ºÆäÀÌ½º¹Ù·Î Àü¹æ ½½¶óÀÌµùÀ» ½ÇÇàÇÑ´Ù.
+	if (IsValid(InputComponent))
+	{
+		InputComponent->BindKey(EKeys::SpaceBar, IE_Pressed, this, &ALostArkPlayerController::OnSlide);
+	}
 
 	if (UEnhancedInputComponent* EnhancedInput =
 		Cast<UEnhancedInputComponent>(InputComponent))
@@ -69,24 +76,26 @@ void ALostArkPlayerController::SetupInputComponent()
 	}
 }
 
+// ìœ íš¨í•œ ì–‘ìˆ˜ ì‹œê°„ì—ë§Œ íƒ€ì´ë¨¸ë¥¼ ë“±ë¡í•´ 0ì´ˆ ì„¤ì •ì—ì„œë„ ì ê¸ˆì´ ë‚¨ì§€ ì•Šê²Œ í•œë‹¤.
 void ALostArkPlayerController::LockMove(float Duration)
 {
-	bCanMove = false;
-
+	GetWorldTimerManager().ClearTimer(MoveLockTimerHandle);
+	bCanMove = !FMath::IsFinite(Duration) || Duration <= 0.f;
+	if (bCanMove) { return; }
 	CancelCurrentMove();
-
-	GetWorldTimerManager().SetTimer(
-		MoveLockTimerHandle,
-		this,
-		&ALostArkPlayerController::UnlockMove,
-		Duration,
-		false
-	);
+	GetWorldTimerManager().SetTimer(MoveLockTimerHandle, this,
+		&ALostArkPlayerController::UnlockMove, Duration, false);
 }
 
 void ALostArkPlayerController::UnlockMove()
 {
 	bCanMove = true;
+}
+
+void ALostArkPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	GetWorldTimerManager().ClearTimer(MoveLockTimerHandle);
+	Super::EndPlay(EndPlayReason);
 }
 
 bool ALostArkPlayerController::GetMouseWorldLocation(FVector& OutLocation)
@@ -163,6 +172,7 @@ void ALostArkPlayerController::Attack(const FHitResult& Hit)
 
 void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 {
+	if (!bCanMove) { return; }
 	UE_LOG(LogTemp, Error,
 		TEXT("MOVE CALLED / VALUE = %f"),
 		InputValue.Get<float>());
@@ -178,16 +188,10 @@ void ALostArkPlayerController::Move(const FInputActionValue& InputValue)
 	UE_LOG(
 		LogTemp,
 		Error,
-		TEXT("Move / MovementLock=%d / ActionLock=%d / CanMove=%d"),
+		TEXT("Move / MovementLock=%d / ActionLock=%d"),
 		PlayerCharacter->IsMovementLocked(),
-		PlayerCharacter->IsActionLocked(),
-		bCanMove
+		PlayerCharacter->IsActionLocked()
 	);
-
-	if (!bCanMove)
-	{
-		return;
-	}
 
 	if (PlayerCharacter->IsMovementLocked())
 	{
@@ -320,4 +324,14 @@ bool ALostArkPlayerController::IsMonster(AActor* Actor) const
 	}
 
 	return Actor->ActorHasTag(TEXT("Monster"));
+}
+
+// ½ÃÀÛ ½Ã ÀÌµ¿ Àá±İÀ» À¯ÁöÇÏ¸ç ½½¶óÀÌµùÀ» ¿äÃ»ÇÑ´Ù.
+void ALostArkPlayerController::OnSlide()
+{
+	if (!bCanMove) { return; }
+	if (ALostArkCharacter* SlidingCharacter = Cast<ALostArkCharacter>(GetPawn()); IsValid(SlidingCharacter))
+	{
+		SlidingCharacter->Slide();
+	}
 }

@@ -3,6 +3,7 @@
 #include "Player/LostArkCharacter.h"
 #include "Combat/CombatComponent.h"
 #include "TimerManager.h"
+#include "NavigationSystem.h"
 #include "GameFramework/DamageType.h"
 #include "Player/LostArkPlayerController.h"
 
@@ -173,6 +174,30 @@ void ALostArkCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	// 부드러운 슬라이딩과 매 프레임 캡슐 충돌 검사를 위해 기존 Tick을 사용한다.
+	if (bSliding && DeltaSeconds > 0.f)
+	{
+		const float StepTime = FMath::Min(DeltaSeconds, SlideRemainingTime);
+		const float StepDistance = FMath::Min(SlideSpeed * StepTime, SlideRemainingDistance);
+		// NavMesh 경계는 물리 충돌이 없어도 멈추고, 벽·액터는 기존 캡슐 Sweep으로 막는다.
+		FVector NavEnd = SlideNavLocation + SlideDirection * StepDistance;
+		FVector NavHit = SlideNavLocation;
+		const bool bNavBlocked = UNavigationSystemV1::NavigationRaycast(
+			this, SlideNavLocation, NavEnd, NavHit, nullptr, GetController());
+		const float SafeStepDistance = bNavBlocked
+			? FMath::Clamp(FVector::Dist2D(SlideNavLocation, NavHit) - 2.f, 0.f, StepDistance)
+			: StepDistance;
+		FHitResult Hit;
+		AddActorWorldOffset(SlideDirection * SafeStepDistance, true, &Hit);
+		SlideNavLocation += SlideDirection * SafeStepDistance;
+		SlideRemainingTime -= StepTime;
+		SlideRemainingDistance -= StepDistance;
+		if (bNavBlocked || Hit.bBlockingHit || SlideRemainingTime <= KINDA_SMALL_NUMBER || SlideRemainingDistance <= KINDA_SMALL_NUMBER)
+		{
+			EnableMovement();
+		}
+	}
+
 	if (LostArkHUD && !bCanBomb)
 	{
 		const float Remaining =
@@ -196,6 +221,59 @@ void ALostArkCharacter::SetCameraArmLength(float Length)
 
 	CameraBoom->TargetArmLength =
 		FMath::Clamp(Length, 300.f, 1200.f);
+}
+
+void ALostArkCharacter::Slide()
+{
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	if (bSliding || bActionLocked || bMovementLocked || !IsValid(Movement) ||
+		!Movement->IsMovingOnGround() || !FMath::IsFinite(SlideDistance) ||
+		!FMath::IsFinite(SlideDuration) || SlideDistance <= 0.f || SlideDuration < 0.01f)
+	{
+		return;
+	}
+
+	// 입력 순간의 마우스 위치를 고정하며 포인터가 가까우면 그 위치까지만 이동한다.
+	APlayerController* SlideController = Cast<APlayerController>(GetController());
+	FHitResult CursorHit;
+	if (!IsValid(SlideController) ||
+		!SlideController->GetHitResultUnderCursor(ECC_Visibility, false, CursorHit) ||
+		!CursorHit.bBlockingHit)
+	{
+		return;
+	}
+	const FVector ToCursor = CursorHit.ImpactPoint - GetActorLocation();
+	SlideDirection = ToCursor.GetSafeNormal2D();
+	if (SlideDirection.IsNearlyZero()) { return; }
+
+	// 캐릭터 발밑이 이동 가능한 영역인지 확인하고 직선 경계를 따라 검사한다.
+	UNavigationSystemV1* Navigation = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	FNavLocation StartNav;
+	const FVector FeetLocation = GetActorLocation() -
+		FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	if (!IsValid(Navigation) || !Navigation->ProjectPointToNavigation(FeetLocation, StartNav,
+		FVector(10.f, 10.f, Movement->MaxStepHeight + 10.f), &Movement->GetNavAgentPropertiesRef()))
+	{
+		return;
+	}
+	SlideNavLocation = StartNav.Location;
+	SlideRemainingDistance = FMath::Min(SlideDistance, ToCursor.Size2D());
+	SetActorRotation(SlideDirection.Rotation());
+	SlideRemainingTime = SlideDuration;
+	SlideSpeed = SlideRemainingDistance / SlideDuration;
+	if (AController* MyController = GetController(); IsValid(MyController))
+	{
+		MyController->StopMovement();
+	}
+	// 기존 입력의 이동 잠금 검사를 재사용하고 종료 시 보행을 복구한다.
+	Movement->StopMovementImmediately();
+	Movement->DisableMovement();
+	bMovementLocked = true;
+	bSliding = true;
+	if (IsValid(SlideMontage))
+	{
+		PlayAnimMontage(SlideMontage);
+	}
 }
 
 
@@ -386,6 +464,12 @@ void ALostArkCharacter::LockMovement(
 	float Duration
 )
 {
+	// 외부 경직이 발생하면 슬라이딩을 중단하고 해당 경직을 따른다.
+	if (bSliding)
+	{
+		bSliding = false;
+		if (IsValid(SlideMontage)) { StopAnimMontage(SlideMontage); }
+	}
 	const float SafeDuration = FMath::IsFinite(Duration)
 		? FMath::Max(Duration, KINDA_SMALL_NUMBER) : KINDA_SMALL_NUMBER;
 	// A repeated lock must not shorten an existing longer lock.
@@ -430,6 +514,9 @@ void ALostArkCharacter::LockMovement(
 
 void ALostArkCharacter::EnableMovement()
 {
+	// 벽에 닿거나 이동 시간이 끝나면 슬라이딩 자세에서도 복귀한다.
+	if (bSliding && IsValid(SlideMontage)) { StopAnimMontage(SlideMontage); }
+	bSliding = false;
 	GetWorldTimerManager().ClearTimer(MovementLockTimerHandle);
 	bMovementLocked = false;
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
