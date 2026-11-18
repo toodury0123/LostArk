@@ -16,6 +16,9 @@
 #include "GameFramework/SpringArmComponent.h"
 
 #include "Player/LostArkCharacter.h"
+#include "Monster/BaseMonster.h"
+#include "Components/CapsuleComponent.h"
+#include "Engine/World.h"
 
 ALostArkPlayerController::ALostArkPlayerController()
 {
@@ -296,7 +299,7 @@ void ALostArkPlayerController::OnBomb()
 
 	FHitResult Hit;
 
-	if (!GetHitResultUnderCursor(ECC_Visibility, false, Hit))
+	if (!GetBombHitUnderCursor(Hit))
 	{
 		return;
 	}
@@ -334,4 +337,58 @@ void ALostArkPlayerController::OnSlide()
 	{
 		SlidingCharacter->Slide();
 	}
+}
+
+
+bool ALostArkPlayerController::GetBombHitUnderCursor(FHitResult& OutHit) const
+{
+	float MouseX = 0.f, MouseY = 0.f;
+	FVector Start, Direction;
+	return GetMousePosition(MouseX, MouseY) &&
+		DeprojectScreenPositionToWorld(MouseX, MouseY, Start, Direction) &&
+		GetBombHitFromRay(Start, Start + Direction * HitResultTraceDistance, OutHit);
+}
+
+
+bool ALostArkPlayerController::GetBombHitFromRay(const FVector& TraceStart, const FVector& TraceEnd, FHitResult& OutHit) const
+{
+	UWorld* World = GetWorld();
+	if (!IsValid(World)) { return false; }
+	FCollisionQueryParams Query(SCENE_QUERY_STAT(BombTarget), false, GetPawn());
+	const bool bWorldHit = World->LineTraceSingleByChannel(OutHit, TraceStart, TraceEnd, ECC_Visibility, Query);
+	float ClosestDistance = bWorldHit ? OutHit.Distance : FVector::Distance(TraceStart, TraceEnd);
+	FCollisionObjectQueryParams Pawns;
+	Pawns.AddObjectTypesToQuery(ECC_Pawn);
+	TArray<FHitResult> PawnHits;
+	World->LineTraceMultiByObjectType(PawnHits, TraceStart, TraceEnd, Pawns, Query);
+	ABaseMonster* Target = nullptr;
+	for (const FHitResult& Hit : PawnHits)
+	{
+		ABaseMonster* Monster = Cast<ABaseMonster>(Hit.GetActor());
+		// 실제 벽 뒤나 사망한 몬스터는 새 표적으로 선택하지 않는다.
+		if (IsValid(Monster) && !Monster->bIsDead && Hit.Distance <= ClosestDistance)
+		{
+			ClosestDistance = Hit.Distance;
+			Target = Monster;
+			OutHit = Hit;
+		}
+	}
+	if (!IsValid(Target)) { return bWorldHit; }
+
+	// 커서가 몬스터 뒤로 통과하지 않게 하고 폭발 중심은 표적 발밑 바닥으로 맞춘다.
+	const UCapsuleComponent* Capsule = Target->GetCapsuleComponent();
+	if (IsValid(Capsule))
+	{
+		FCollisionQueryParams GroundQuery(Query);
+		GroundQuery.AddIgnoredActor(Target);
+		const FVector GroundStart = Target->GetActorLocation();
+		FHitResult GroundHit;
+		if (World->LineTraceSingleByChannel(GroundHit, GroundStart,
+			GroundStart - FVector(0.f, 0.f, Capsule->GetScaledCapsuleHalfHeight() + 100.f), ECC_Visibility, GroundQuery) &&
+			GroundHit.ImpactNormal.Z >= 0.5f && !Cast<APawn>(GroundHit.GetActor()))
+		{
+			OutHit = GroundHit;
+		}
+	}
+	return true;
 }

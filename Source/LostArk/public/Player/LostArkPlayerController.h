@@ -47,7 +47,7 @@ public:
 	
 	// 시작 후 이동과 슬라이딩을 기다리는 시간. 0초이면 즉시 허용한다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Move", meta = (ClampMin = "0.0", Units = "s"))
-	float StartDelay = 3.f;
+	float StartDelay = 1.f;
 
 	bool bLeftClickDown = false;
 	bool bRightClickDown = false;
@@ -68,6 +68,9 @@ public:
 	
 	void Move(const struct FInputActionValue& inputValue);
 	void OnBomb();
+	// Bomb 조준은 Visibility를 무시하는 몬스터도 찾고, 앞을 막는 벽은 유지한다.
+	UFUNCTION(BlueprintCallable, Category = "Bomb|Targeting")
+	bool GetBombHitFromRay(const FVector& TraceStart, const FVector& TraceEnd, FHitResult& OutHit) const;
 	// 스페이스바 입력으로 마우스 방향 슬라이딩을 요청한다.
 	void OnSlide();
 
@@ -79,4 +82,6 @@ private:
 	void UnlockMove();
 
 	void CancelCurrentMove();
+	// 실제 커서와 자동 검증이 같은 Bomb 표적 판정 경로를 사용한다.
+	bool GetBombHitUnderCursor(FHitResult& OutHit) const;
 };
