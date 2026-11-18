@@ -100,7 +100,6 @@ public class Tripo3DUEBridge : ModuleRules
 			if (Directory.Exists(TestPath))
 			{
 				ZlibVersion = Version;
-				System.Console.WriteLine("[Tripo3DUEBridge] Found zlib version: " + Version);
 				break;
 			}
 		}

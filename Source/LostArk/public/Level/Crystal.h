@@ -38,8 +38,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Shake")
 	float ShakeDuration = 0.15f;
-
 	UPROPERTY(EditAnywhere, Category = "Shake")
+	
 	float ShakeStrength = 10.f;
 
 protected:
